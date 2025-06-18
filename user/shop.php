@@ -11,7 +11,10 @@ $query = $conn->query("SELECT id, product_name, main_image FROM products");
   <title>Shop Products</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-6 font-sans">
+<body class="bg-gray-100 font-sans">
+
+<?php include 'navbar/top.php'; ?>
+
   <div class="max-w-6xl mx-auto">
     <h1 class="text-3xl font-bold mb-6 text-orange-600">Shop Products</h1>
 
@@ -21,7 +24,7 @@ $query = $conn->query("SELECT id, product_name, main_image FROM products");
           <?php if (!empty($row['main_image'])): ?>
             <img 
               src="data:image/jpeg;base64,<?= base64_encode($row['main_image']) ?>" 
-              class="w-full h-48 object-contain rounded border group-hover:scale-105 transition-transform duration-300" 
+              class="w-full h-48 object-contain rounded group-hover:scale-105 transition-transform duration-300" 
               alt="<?= htmlspecialchars($row['product_name']) ?>" 
             />
           <?php else: ?>

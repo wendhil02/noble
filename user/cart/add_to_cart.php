@@ -94,7 +94,7 @@ if ($image_data) {
         $_SESSION['cart'][$cart_key]['quantity'] += 1;
     }
 
-    echo "<script>alert('Added to cart successfully!'); window.location.href='cart_view.php?id=$product_id';</script>";
+    echo "<script>alert('Added to cart successfully!'); window.location.href='../product_view.php?id=$product_id';</script>";
     exit;
 }
 ?>

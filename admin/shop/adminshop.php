@@ -48,6 +48,13 @@ ini_set('display_errors', 1);
       <div class="mt-6">
         <button type="submit" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">Upload Product</button>
       </div>
+
+    <a href="adminupdateshop" class="text-blue-600 hover:underline">
+      <div class="mt-6">
+        <button type="button" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">Update Product</button>
+      </div>
+      </a>
+
     </form>
   </div>
 
@@ -67,7 +74,7 @@ ini_set('display_errors', 1);
         </div>
         <div class="mb-3 flex gap-2">
           <input type="text" name="type_name[]" placeholder="Type Name" class="border p-2 w-1/2 rounded" required />
-          <input type="file" name="type_image[]" accept="image/*" class="w-1/2" required />
+          <input type="file" name="type_image[]" accept="image/*" class="w-1/2 mt-1" required />
         </div>
         <div>
           <label class="block font-medium mb-1">Variant Colors for this type:</label>

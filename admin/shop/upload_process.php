@@ -3,6 +3,34 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include '../../connection/connect.php';
 
+
+// Check if table is empty
+$result = $conn->query("SELECT COUNT(*) as total FROM products");
+$row = $result->fetch_assoc();
+
+if ($row['total'] == 0) {
+    // Reset auto_increment to 1
+    $conn->query("ALTER TABLE products AUTO_INCREMENT = 1");
+}
+
+// Check if table is empty
+$result = $conn->query("SELECT COUNT(*) as total FROM product_types");
+$row = $result->fetch_assoc();
+
+if ($row['total'] == 0) {
+    // Reset auto_increment to 1
+    $conn->query("ALTER TABLE product_types AUTO_INCREMENT = 1");
+}
+
+
+$result = $conn->query("SELECT COUNT(*) as total FROM product_variants");
+$row = $result->fetch_assoc();
+
+if ($row['total'] == 0) {
+    // Reset auto_increment to 1
+    $conn->query("ALTER TABLE product_variants AUTO_INCREMENT = 1");
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $product_name = $_POST['product_name'];
     $codename = $_POST['codename'];

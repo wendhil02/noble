@@ -1,9 +1,33 @@
 <?php
 include '../connection/connect.php'; // Adjust path if needed
 
-// Fetch images for category 1 (MARINE)
-$query1 = "SELECT id, description, image_data FROM images WHERE category = 1 ORDER BY id DESC";
-$result1 = mysqli_query($conn, $query1);
+$query_variants1 = "SELECT id, type_id, color, size, price, percent, image FROM product_variants ORDER BY id DESC";
+$result_variants = mysqli_query($conn, $query_variants1);
+
+// Indoor Variants
+$indoor_query = "
+    SELECT pv.*, pt.product_id, p.product_name, p.codename 
+    FROM product_variants pv
+    JOIN product_types pt ON pv.type_id = pt.id
+    JOIN products p ON pt.product_id = p.id
+    WHERE p.codename = 'indoor'
+    ORDER BY pv.id DESC
+";
+$indoor_result = mysqli_query($conn, $indoor_query);
+
+// Marine Variants
+$marine_query = "
+    SELECT pv.*, pt.product_id, p.product_name, p.codename 
+    FROM product_variants pv
+    JOIN product_types pt ON pv.type_id = pt.id
+    JOIN products p ON pt.product_id = p.id
+    WHERE p.codename = 'marine'
+    ORDER BY pv.id DESC
+";
+$marine_result = mysqli_query($conn, $marine_query);
+
+
+
 
 // Fetch images for category 2 (INDUSTRIAL)
 $query2 = "SELECT id, description, image_data FROM images WHERE category = 2 ORDER BY id DESC";
@@ -267,84 +291,54 @@ $result4 = mysqli_query($conn, $query4);
                 </div>
             </div>
 
-            <!-- SECTION: MARINE -->
-            <section class="p-3">
-                <div class="mb-12 mt-10">
-                    <h2 class="text-4xl font-bold text-orange-500 mb-4">MARINE</h2>
+<section class="p-3">
+    <div class="mb-12 mt-10">
+        <h2 class="text-4xl font-bold text-orange-500 mb-4">Flutted</h2>
+         <div class="relative -bottom-2 left-0 w-12 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+    </div>
+    <div class="swiper mySwiper-indoor">
+        <div class="swiper-wrapper">
+            <?php while ($row = mysqli_fetch_assoc($indoor_result)) : ?>
+                <div class="swiper-slide bg-white rounded-lg shadow-md p-4 text-center">
+                    <a href="product_view.php?id=<?= $row['product_id'] ?>">
+                        <img src="data:image/jpeg;base64,<?= base64_encode($row['image']) ?>" class="w-[150px] h-[150px] object-contain mx-auto mb-3 rounded-lg hover:scale-105 transition" />
+                    </a>
+                    <p class="text-sm text-orange-600 font-bold "><?= htmlspecialchars($row['color']) ?></p>
+                    <p class="text-sm text-gray-600">Size: <?= htmlspecialchars($row['size']) ?></p>
                 </div>
+            <?php endwhile; ?>
+        </div>
+    </div>
+</section>
 
-                <div class="swiper mySwiper">
-                    <div class="swiper-wrapper">
-                        <?php while ($row = mysqli_fetch_assoc($result1)) : ?>
-                            <div class="swiper-slide bg-white rounded-lg shadow-md p-4 text-center">
-                                <a href="image_detail.php?id=<?= $row['id'] ?>">
-                                    <img src="data:image/jpeg;base64,<?= base64_encode($row['image_data']) ?>"
-                                        alt="<?= isset($row['description']) ? htmlspecialchars($row['description']) : '' ?>"
-                                        class="w-[150px] h-[150px] object-contain mx-auto mb-3 rounded-lg hover:scale-105 transition" />
-                                </a>
-                                <p class="text-orange-600 font-semibold text-sm">
-                                    <?= isset($row['description']) ? htmlspecialchars($row['description']) : 'No description' ?>
-                                </p>
-                            </div>
-                        <?php endwhile; ?>
-                    </div>
+<section class="p-3">
+    <div class="mb-12 mt-10">
+        <h2 class="text-4xl font-bold text-orange-500 mb-4">MARINE</h2>
+         <div class="relative -bottom-2 left-0 w-12 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+    </div>
+    <div class="swiper mySwiper-marine">
+        <div class="swiper-wrapper">
+            <?php while ($row = mysqli_fetch_assoc($marine_result)) : ?>
+                <div class="swiper-slide bg-white rounded-lg shadow-md p-4 text-center">
+                    <a href="product_view.php?id=<?= $row['product_id'] ?>">
+                        <img src="data:image/jpeg;base64,<?= base64_encode($row['image']) ?>" class="w-[150px] h-[150px] object-contain mx-auto mb-3 rounded-lg hover:scale-105 transition" />
+                    </a>
+                    <p class="text-orange-600 font-semibold text-sm"><?= htmlspecialchars($row['product_name']) ?></p>
+                    <p class="text-sm text-gray-600">Color: <?= htmlspecialchars($row['color']) ?></p>
+                    <p class="text-sm text-gray-600">Size: <?= htmlspecialchars($row['size']) ?></p>
                 </div>
-            </section>
+            <?php endwhile; ?>
+        </div>
+    </div>
+</section>
 
-            <!-- SECTION: INDUSTRIAL -->
-            <section class="p-3">
-                <div class="mb-12 mt-10">
-                    <h2 class="text-4xl font-bold text-orange-500 mb-4">Tubular</h2>
-                </div>
-
-                <div class="swiper mySwiper">
-                    <div class="swiper-wrapper">
-                        <?php while ($row = mysqli_fetch_assoc($result2)) : ?>
-                            <div class="swiper-slide bg-white rounded-lg shadow-md p-4 text-center">
-                                <a href="image_detail.php?id=<?= $row['id'] ?>">
-                                    <img src="data:image/jpeg;base64,<?= base64_encode($row['image_data']) ?>"
-                                        alt="<?= isset($row['description']) ? htmlspecialchars($row['description']) : '' ?>"
-                                        class="w-[150px] h-[150px] object-contain mx-auto mb-3 rounded-lg hover:scale-105 transition" />
-                                </a>
-                                <p class="text-orange-600 font-semibold text-sm">
-                                    <?= isset($row['description']) ? htmlspecialchars($row['description']) : 'No description' ?>
-                                </p>
-                            </div>
-                        <?php endwhile; ?>
-                    </div>
-                </div>
-            </section>
-
-
-            <!-- SECTION: INDUSTRIAL -->
-            <section class="p-3">
-                <div class="mb-12 mt-10">
-                    <h2 class="text-4xl font-bold text-orange-500 mb-4">Out Door</h2>
-                </div>
-
-                <div class="swiper mySwiper">
-                    <div class="swiper-wrapper">
-                        <?php while ($row = mysqli_fetch_assoc($result3)) : ?>
-                            <div class="swiper-slide bg-white rounded-lg shadow-md p-4 text-center">
-                                <a href="image_detail.php?id=<?= $row['id'] ?>">
-                                    <img src="data:image/jpeg;base64,<?= base64_encode($row['image_data']) ?>"
-                                        alt="<?= isset($row['description']) ? htmlspecialchars($row['description']) : '' ?>"
-                                        class="w-[150px] h-[150px] object-contain mx-auto mb-3 rounded-lg hover:scale-105 transition" />
-                                </a>
-                                <p class="text-orange-600 font-semibold text-sm">
-                                    <?= isset($row['description']) ? htmlspecialchars($row['description']) : 'No description' ?>
-                                </p>
-                            </div>
-                        <?php endwhile; ?>
-                    </div>
-                </div>
-            </section>
 
 
             <!-- SECTION: INDUSTRIAL -->
             <section class="p-3">
                 <div class="mb-12 mt-10">
                     <h2 class="text-4xl font-bold text-orange-500 mb-4">UV Board</h2>
+                     <div class="relative -bottom-2  w-12 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
                 </div>
 
                 <div class="swiper mySwiper">
@@ -367,7 +361,6 @@ $result4 = mysqli_query($conn, $query4);
 
         </div>
     </section>
-
 
 
 
@@ -541,7 +534,7 @@ $result4 = mysqli_query($conn, $query4);
                     <div class="flex items-center space-x-4 mb-6">
                         <!-- Logo with glow and pulse -->
                         <div class="relative">
-                            <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center shadow-2xl glow-effect floating overflow-hidden">
+                            <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-2xl glow-effect floating overflow-hidden">
                                 <img src="img/logo/logo.png" alt="Noble Home Logo" class="w-10 h-10 object-cover">
                             </div>
                             <div class="absolute -top-1 -right-1 w-4 h-4 bg-blue-400 rounded-full animate-pulse"></div>
@@ -674,23 +667,36 @@ $result4 = mysqli_query($conn, $query4);
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        const swiper = new Swiper(".mySwiper", {
-            slidesPerView: 2,
-            spaceBetween: 20,
-            loop: true,
-            autoplay: {
-                delay: 2500,
-                disableOnInteraction: false,
-            },
-            breakpoints: {
-                640: {
-                    slidesPerView: 3,
-                },
-                1024: {
-                    slidesPerView: 6,
-                },
-            },
-        });
+
+  new Swiper('.mySwiper-indoor', {
+    slidesPerView: 2,
+    spaceBetween: 20,
+    autoplay: {
+      delay: 2500, // 2.5 seconds per slide
+      disableOnInteraction: false, // keep autoplay after user interaction
+    },
+    loop: true, // makes the swiper loop back to the beginning
+    breakpoints: {
+      768: { slidesPerView: 3 },
+      1024: { slidesPerView: 4 },
+    },
+  });
+
+  new Swiper('.mySwiper-marine', {
+    slidesPerView: 2,
+    spaceBetween: 20,
+    autoplay: {
+      delay: 2500,
+      disableOnInteraction: false,
+    },
+
+    loop: true,
+    breakpoints: {
+      768: { slidesPerView: 4 },
+      1024: { slidesPerView: 5 },
+    },
+
+  });
 
 
         // Smooth scrolling for navigation links
