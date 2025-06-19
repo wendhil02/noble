@@ -15,13 +15,13 @@
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex justify-between items-center py-4">
       <!-- Logo -->
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded overflow-hidden">
-          <img src="img/logo/logo.png" alt="Noble Home Logo" class="w-full h-full object-cover">
-        </div>
-        <span class="text-2xl font-bold text-orange-500">NobleHome
-        </span>
-      </div>
+     <a href="index.php" class="flex items-center space-x-3 hover:opacity-80 transition">
+  <div class="w-10 h-10 rounded overflow-hidden">
+    <img src="img/logo/logo.png" alt="Noble Home Logo" class="w-full h-full object-cover">
+  </div>
+  <span class="text-2xl font-bold text-orange-500">NobleHome</span>
+</a>
+
 
       <!-- Desktop Links -->
       <div class="hidden md:flex space-x-6 items-center">

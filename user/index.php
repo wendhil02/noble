@@ -27,11 +27,11 @@ $filter = mysqli_real_escape_string($conn, $_GET['filter'] ?? '');
 // Furniture Query
 $furniture_query = "SELECT * FROM products WHERE codename = 'furniture'";
 if ($search) {
-  $furniture_query .= " AND product_name LIKE '%$search%'";
+    $furniture_query .= " AND product_name LIKE '%$search%'";
 }
 if ($filter && $filter !== 'furniture') {
-  // Skip furniture results if another filter is selected
-  $furniture_query .= " AND 1=0";
+    // Skip furniture results if another filter is selected
+    $furniture_query .= " AND 1=0";
 }
 $furniture_query .= " ORDER BY id DESC";
 $SYCJ_result = mysqli_query($conn, $furniture_query);
@@ -39,15 +39,18 @@ $SYCJ_result = mysqli_query($conn, $furniture_query);
 // Material Query
 $material_query = "SELECT * FROM products WHERE codename = 'material'";
 if ($search) {
-  $material_query .= " AND product_name LIKE '%$search%'";
+    $material_query .= " AND product_name LIKE '%$search%'";
 }
 if ($filter && $filter !== 'material') {
-  $material_query .= " AND 1=0";
+    $material_query .= " AND 1=0";
 }
 $material_query .= " ORDER BY id DESC";
 $material_result = mysqli_query($conn, $material_query);
 
-
+$discount_result = mysqli_query(
+    $conn,
+    "SELECT * FROM product_variants ORDER BY percent ASC"
+);
 
 
 ?>
@@ -212,6 +215,51 @@ $material_result = mysqli_query($conn, $material_query);
             </button>
         </div>
     </section>
+    <section class="bg-gradient-to-r from-orange-500 to-red-500 text-white py-1 px-2 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+
+            <!-- Discount Text -->
+            <div class="flex items-center gap-3">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 14l6-6M15 14l-6-6M9 10h6v4H9z" />
+                </svg>
+                <p class="text-lg font-semibold">
+                    Not Available For Now <span class="underline font-bold"> Discount Banner</span>
+                </p>
+            </div>
+
+            <!-- Action Button -->
+            <a href="shop.php#discounts" class="bg-white text-orange-600 hover:bg-gray-100 font-semibold px-5 py-1 rounded-lg shadow transition">
+                Shop Now
+            </a>
+        </div>
+    </section>
+
+
+    <section class="bg-white shadow-md py-4 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+
+            <!-- Inquire Block -->
+            <a href="inquire.php" class="flex-1 bg-orange-100 hover:bg-orange-200 transition rounded-lg p-4 text-center">
+                <h3 class="text-lg font-semibold text-orange-700">📩 Inquire</h3>
+                <p class="text-sm text-gray-700">Send us a question or message.</p>
+            </a>
+
+            <!-- Divider for mobile view -->
+            <div class="hidden md:block w-px bg-gray-300 h-10 mx-4"></div>
+
+            <!-- Appointment Block -->
+            <a href="appointment.php" class="flex-1 bg-orange-100 hover:bg-orange-200 transition rounded-lg p-4 text-center">
+                <h3 class="text-lg font-semibold text-orange-700">📅 Appointment</h3>
+                <p class="text-sm text-gray-700">Book a consultation now.</p>
+            </a>
+
+        </div>
+    </section>
+
+
 
 
     <!-- Products Section -->
@@ -221,38 +269,75 @@ $material_result = mysqli_query($conn, $material_query);
                 <h2 class="text-4xl font-bold text-white mb-4">Our Products</h2>
                 <p class="text-white max-w-2xl mx-auto">Discover our wide range of quality materials and furniture for your home and construction needs.</p>
             </div>
-<form method="GET" action="#products" class="max-w-2xl mx-auto mb-10">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <button type="submit" class="bg-orange-500 text-white px-4 py-2 font-semibold rounded">
-      Search
-    </button>
-    <!-- Search Input -->
-    <input
-      type="text"
-      name="search"
-      placeholder="Search products..."
-      value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
-      class="px-4 py-2 border rounded w-full"
-    />
+            <form method="GET" action="#products" class="max-w-2xl mx-auto mb-10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button type="submit" class="bg-orange-500 text-white px-4 py-2 font-semibold rounded">
+                        Search
+                    </button>
+                    <!-- Search Input -->
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Search products..."
+                        value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+                        class="px-4 py-2 border rounded w-full" />
 
-    <!-- Filter Dropdown -->
-    <select name="filter" class="px-4 py-2 border rounded w-full">
-      <option value="">All Categories</option>
-      <option value="furniture" <?= ($_GET['filter'] ?? '') === 'furniture' ? 'selected' : '' ?>>Furniture</option>
-      <option value="material" <?= ($_GET['filter'] ?? '') === 'material' ? 'selected' : '' ?>>Material</option>
-    </select>
-
-  
-  </div>
-</form>
+                    <!-- Filter Dropdown -->
+                    <select name="filter" class="px-4 py-2 border rounded w-full">
+                        <option value="">All Categories</option>
+                        <option value="furniture" <?= ($_GET['filter'] ?? '') === 'furniture' ? 'selected' : '' ?>>Furniture</option>
+                        <option value="material" <?= ($_GET['filter'] ?? '') === 'material' ? 'selected' : '' ?>>Material</option>
+                    </select>
 
 
+                </div>
+            </form>
+
+            <!-- Compact Discount Banner  -->
+            <section class="py-8 bg-white">
+                <div class="max-w-7xl mx-auto px-4">
+                    <h2 class="text-2xl font-bold text-orange-600 mb-6 text-center">
+                        Not Available For Now Discounted Variants
+                    </h2>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <?php while ($v = mysqli_fetch_assoc($discount_result)): ?>
+                            <div class="bg-white rounded-lg shadow hover:shadow-md p-2 transition text-center">
+
+                                <!-- Img (smaller) -->
+                                <?php if (!empty($v['image'])): ?>
+                                    <div class="aspect-[1/1] bg-gray-50 rounded mb-2 overflow-hidden">
+                                        <img src="data:image/jpeg;base64,<?= base64_encode($v['image']) ?>"
+                                            alt="Variant"
+                                            class="w-full h-full object-contain" />
+                                    </div>
+                                <?php else: ?>
+                                    <div class="aspect-[1/1] bg-gray-200 flex items-center justify-center text-xs text-gray-500 mb-2 rounded">
+                                        No Image
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Info (tiny) -->
+                                <h3 class="text-xs font-semibold text-gray-800 break-words">
+                                    <?= htmlspecialchars($v['color']) ?> (<?= htmlspecialchars($v['size']) ?>)
+                                </h3>
+                                <p class="text-[11px] text-gray-600">₱<?= number_format($v['price'], 2) ?></p>
+                                <span class="inline-block mt-1 text-[11px] px-2 py-[1px] bg-green-100 text-green-600 rounded">
+                                    -<?= $v['percent'] ?>%
+                                </span>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
+                </div>
+            </section>
 
             <section class="p-3">
                 <div class="mb-12 mt-10">
                     <h2 class="text-4xl font-bold text-orange-500 mb-4">Furniture</h2>
+                    <h6 class="text-white text-md">Explore our range of furniture products.</h6>
                     <div class="relative -bottom-2 left-0 w-15 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
                 </div>
+
 
                 <div class="swiper mySwiper-indoor">
                     <div class="swiper-wrapper">
@@ -271,7 +356,10 @@ $material_result = mysqli_query($conn, $material_query);
                                         <?php endif; ?>
                                     </div>
                                     <!-- Product Name -->
-                                    <h2 class="text-sm bg-red-900 font-semibold text-white rounded-lg p-3 break-words"><?= htmlspecialchars($row['product_name']) ?></h2>
+                                    <h2 class="text-xs  bg-red-900 font-semibold text-white rounded-lg px-3 py-2 text-center break-words">
+                                        <?= htmlspecialchars($row['product_name']) ?>
+                                    </h2>
+
                                 </a>
                             </div>
                         <?php endwhile; ?>
@@ -347,12 +435,6 @@ $material_result = mysqli_query($conn, $material_query);
             <!-- Right Side: Text & Buttons -->
             <div class="w-full lg:w-1/2 text-center lg:text-left">
                 <!-- Brand Badge -->
-                <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-2 mb-6 mx-auto lg:mx-0">
-                    <div class="w-8 h-8 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
-                        <span class="text-white font-bold text-sm">NH</span>
-                    </div>
-                    <span class="text-white/90 font-medium">Premium Quality Materials</span>
-                </div>
 
                 <!-- Heading -->
                 <h1 class="text-4xl md:text-6xl font-black text-white mb-6 text-shadow leading-tight">
@@ -390,8 +472,8 @@ $material_result = mysqli_query($conn, $material_query);
                         </div>
                     </div>
 
-                   
-             
+
+
                 </div>
             </div>
         </div>
