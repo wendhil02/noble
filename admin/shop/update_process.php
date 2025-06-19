@@ -1,96 +1,117 @@
 <?php
+
+include '../../connection/connect.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-include '../../connection/connect.php';
 
-// Check if table is empty
-$result = $conn->query("SELECT COUNT(*) as total FROM products");
-$row = $result->fetch_assoc();
-
-if ($row['total'] == 0) {
-    // Reset auto_increment to 1
-    $conn->query("ALTER TABLE products AUTO_INCREMENT = 1");
+$product_id = $_POST['product_id'] ?? null;
+if (!$product_id) {
+    echo "Missing product ID.";
+    exit;
 }
 
+// Main Product Info
+$product_name = $_POST['product_name'];
+$codename = $_POST['codename'];
+$quantity = $_POST['quantity'];
+$main_image = null;
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $product_id = $_POST['product_id'];
-    $product_name = $_POST['product_name'];
-    $codename = $_POST['codename'];
-    $quantity = $_POST['quantity'];
+if (!empty($_FILES['main_image']['tmp_name'])) {
+    $main_image = file_get_contents($_FILES['main_image']['tmp_name']);
+}
 
-    // Handle main image (only update if uploaded)
-    if (!empty($_FILES['main_image']['tmp_name'])) {
-        $main_image_data = file_get_contents($_FILES['main_image']['tmp_name']);
-        $stmt = $conn->prepare("UPDATE products SET product_name = ?, codename = ?, quantity = ?, main_image = ? WHERE id = ?");
-        $stmt->bind_param("ssbsi", $product_name, $codename, $quantity, $main_image_data, $product_id);
-        $stmt->send_long_data(3, $main_image_data); // index 3 is main_image
-    } else {
-        $stmt = $conn->prepare("UPDATE products SET product_name = ?, codename = ?, quantity = ? WHERE id = ?");
-        $stmt->bind_param("sssi", $product_name, $codename, $quantity, $product_id);
+if ($main_image) {
+    $stmt = $conn->prepare("UPDATE products SET product_name=?, codename=?, quantity=?, main_image=? WHERE id=?");
+    $stmt->bind_param("ssisi", $product_name, $codename, $quantity, $main_image, $product_id);
+} else {
+    $stmt = $conn->prepare("UPDATE products SET product_name=?, codename=?, quantity=? WHERE id=?");
+    $stmt->bind_param("ssii", $product_name, $codename, $quantity, $product_id);
+}
+$stmt->execute();
+
+// Delete types
+if (!empty($_POST['delete_type'])) {
+    foreach ($_POST['delete_type'] as $type_id) {
+        $type_id = intval($type_id);
+        $conn->query("DELETE FROM product_variants WHERE type_id = $type_id");
+        $conn->query("DELETE FROM product_types WHERE id = $type_id");
     }
-    $stmt->execute();
+}
 
-    // Loop through each type
-    foreach ($_POST['type_id'] as $i => $type_id) {
-        $type_name = $_POST['type_name'][$i];
+// Delete specific variants
+if (!empty($_POST['delete_variant'])) {
+    foreach ($_POST['delete_variant'] as $typeIndex => $variantIds) {
+        foreach ($variantIds as $variantId) {
+            $variantId = intval($variantId);
+            $conn->query("DELETE FROM product_variants WHERE id = $variantId");
+        }
+    }
+}
 
-        // Update type (with image if exists)
-        if (!empty($_FILES['type_image']['tmp_name'][$i])) {
-            $type_image_data = file_get_contents($_FILES['type_image']['tmp_name'][$i]);
-            $stmt = $conn->prepare("UPDATE product_types SET type_name = ?, type_image = ? WHERE id = ?");
-            $stmt->bind_param("sbi", $type_name, $type_image_data, $type_id);
-            $stmt->send_long_data(1, $type_image_data);
+// Types and Variants
+foreach ($_POST['type_id'] as $i => $type_id) {
+    $type_name = $_POST['type_name'][$i];
+    $type_image = null;
+
+    if (!empty($_FILES['type_image']['tmp_name'][$i])) {
+        $type_image = file_get_contents($_FILES['type_image']['tmp_name'][$i]);
+    }
+
+    // If new, insert type
+    if ($type_id === 'new') {
+        if ($type_image) {
+            $stmt = $conn->prepare("INSERT INTO product_types (product_id, type_name, type_image) VALUES (?, ?, ?)");
+            $stmt->bind_param("iss", $product_id, $type_name, $type_image);
         } else {
-            $stmt = $conn->prepare("UPDATE product_types SET type_name = ? WHERE id = ?");
+            $stmt = $conn->prepare("INSERT INTO product_types (product_id, type_name) VALUES (?, ?)");
+            $stmt->bind_param("is", $product_id, $type_name);
+        }
+        $stmt->execute();
+        $type_id = $stmt->insert_id;
+    } else {
+        $type_id = intval($type_id);
+        if ($type_image) {
+            $stmt = $conn->prepare("UPDATE product_types SET type_name=?, type_image=? WHERE id=?");
+            $stmt->bind_param("sbi", $type_name, $type_image, $type_id);
+        } else {
+            $stmt = $conn->prepare("UPDATE product_types SET type_name=? WHERE id=?");
             $stmt->bind_param("si", $type_name, $type_id);
         }
         $stmt->execute();
+    }
 
-        // Handle variants per type
-        if (!empty($_POST['variant_color'][$i])) {
-            foreach ($_POST['variant_color'][$i] as $j => $variant_color) {
-                $variant_size = $_POST['variant_size'][$i][$j];
-                $variant_price = $_POST['variant_price'][$i][$j];
-                $variant_percent = isset($_POST['variant_percent'][$i][$j]) && $_POST['variant_percent'][$i][$j] !== '' 
-                    ? floatval($_POST['variant_percent'][$i][$j]) 
-                    : 0;
+    // Variants
+    if (!empty($_POST['variant_color'][$i])) {
+        foreach ($_POST['variant_color'][$i] as $j => $color) {
+            $variant_id = $_POST['variant_id'][$i][$j];
+            $size = $_POST['variant_size'][$i][$j];
+            $price = $_POST['variant_price'][$i][$j];
+            $percent = $_POST['variant_percent'][$i][$j] ?? null;
+            $variant_image = null;
 
-                $variant_id = $_POST['variant_id'][$i][$j] ?? null;
-                $has_image = isset($_FILES['variant_image']['tmp_name'][$i][$j]) && $_FILES['variant_image']['error'][$i][$j] === UPLOAD_ERR_OK;
+            if (!empty($_FILES['variant_image']['tmp_name'][$i][$j])) {
+                $variant_image = file_get_contents($_FILES['variant_image']['tmp_name'][$i][$j]);
+            }
 
-                if ($variant_id === 'new') {
-                    // Insert new variant
-                    if ($has_image) {
-                        $variant_image_data = file_get_contents($_FILES['variant_image']['tmp_name'][$i][$j]);
-                        $stmt = $conn->prepare("INSERT INTO product_variants (type_id, color, size, price, percent, image) VALUES (?, ?, ?, ?, ?, ?)");
-                        $stmt->bind_param("issdds", $type_id, $variant_color, $variant_size, $variant_price, $variant_percent, $variant_image_data);
-                        $stmt->send_long_data(5, $variant_image_data);
-                    } else {
-                        $stmt = $conn->prepare("INSERT INTO product_variants (type_id, color, size, price, percent) VALUES (?, ?, ?, ?, ?)");
-                        $stmt->bind_param("issdd", $type_id, $variant_color, $variant_size, $variant_price, $variant_percent);
-                    }
-                    $stmt->execute();
+            if ($variant_id === "new") {
+                $stmt = $conn->prepare("INSERT INTO product_variants (type_id, color, size, price, percent, image) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("issdds", $type_id, $color, $size, $price, $percent, $variant_image);
+                $stmt->execute();
+            } else {
+                $variant_id = intval($variant_id);
+                if ($variant_image) {
+                    $stmt = $conn->prepare("UPDATE product_variants SET color=?, size=?, price=?, percent=?, image=? WHERE id=?");
+                    $stmt->bind_param("ssddsi", $color, $size, $price, $percent, $variant_image, $variant_id);
                 } else {
-                    // Update existing variant
-                    if ($has_image) {
-                        $variant_image_data = file_get_contents($_FILES['variant_image']['tmp_name'][$i][$j]);
-                        $stmt = $conn->prepare("UPDATE product_variants SET color = ?, size = ?, price = ?, percent = ?, image = ? WHERE id = ?");
-                        $stmt->bind_param("ssddsi", $variant_color, $variant_size, $variant_price, $variant_percent, $variant_image_data, $variant_id);
-                        $stmt->send_long_data(4, $variant_image_data);
-                    } else {
-                        $stmt = $conn->prepare("UPDATE product_variants SET color = ?, size = ?, price = ?, percent = ? WHERE id = ?");
-                        $stmt->bind_param("ssdsi", $variant_color, $variant_size, $variant_price, $variant_percent, $variant_id);
-                    }
-                    $stmt->execute();
+                    $stmt = $conn->prepare("UPDATE product_variants SET color=?, size=?, price=?, percent=? WHERE id=?");
+                    $stmt->bind_param("ssddi", $color, $size, $price, $percent, $variant_id);
                 }
+                $stmt->execute();
             }
         }
     }
-
-    echo "<script>alert('Product updated successfully!'); window.location.href='adminshop.php';</script>";
-    exit;
-} else {
-    echo "Invalid request.";
 }
+
+echo "<script>alert('Product updated successfully!'); window.location.href = 'adminshop.php';</script>";
+
 ?>

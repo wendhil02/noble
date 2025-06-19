@@ -3,46 +3,53 @@ include '../connection/connect.php'; // Adjust path if needed
 
 $query_variants1 = "SELECT id, type_id, color, size, price, percent, image FROM product_variants ORDER BY id DESC";
 $result_variants = mysqli_query($conn, $query_variants1);
-
-// Indoor Variants
-$indoor_query = "
-    SELECT pv.*, pt.product_id, p.product_name, p.codename 
-    FROM product_variants pv
-    JOIN product_types pt ON pv.type_id = pt.id
-    JOIN products p ON pt.product_id = p.id
-    WHERE p.codename = 'indoor'
-    ORDER BY pv.id DESC
+// Indoor Variants: Fetch unique products by codename
+$SYCJ_query = "
+    SELECT * FROM products
+    WHERE codename = 'furniture'
+    ORDER BY id DESC
 ";
-$indoor_result = mysqli_query($conn, $indoor_query);
+$SYCJ_result = mysqli_query($conn, $SYCJ_query);
 
-// Marine Variants
-$marine_query = "
-    SELECT pv.*, pt.product_id, p.product_name, p.codename 
-    FROM product_variants pv
-    JOIN product_types pt ON pv.type_id = pt.id
-    JOIN products p ON pt.product_id = p.id
-    WHERE p.codename = 'marine'
-    ORDER BY pv.id DESC
+$material_query = "
+    SELECT * FROM products
+    WHERE codename = 'material'
+    ORDER BY id DESC
 ";
-$marine_result = mysqli_query($conn, $marine_query);
+$material_result = mysqli_query($conn, $material_query);
 
 
 
 
-// Fetch images for category 2 (INDUSTRIAL)
-$query2 = "SELECT id, description, image_data FROM images WHERE category = 2 ORDER BY id DESC";
+$search = mysqli_real_escape_string($conn, $_GET['search'] ?? '');
+$filter = mysqli_real_escape_string($conn, $_GET['filter'] ?? '');
 
-$result2 = mysqli_query($conn, $query2);
+// Furniture Query
+$furniture_query = "SELECT * FROM products WHERE codename = 'furniture'";
+if ($search) {
+  $furniture_query .= " AND product_name LIKE '%$search%'";
+}
+if ($filter && $filter !== 'furniture') {
+  // Skip furniture results if another filter is selected
+  $furniture_query .= " AND 1=0";
+}
+$furniture_query .= " ORDER BY id DESC";
+$SYCJ_result = mysqli_query($conn, $furniture_query);
 
-// Fetch images for category 2 (INDUSTRIAL)
-$query3 = "SELECT id, description, image_data FROM images WHERE category = 3 ORDER BY id DESC";
+// Material Query
+$material_query = "SELECT * FROM products WHERE codename = 'material'";
+if ($search) {
+  $material_query .= " AND product_name LIKE '%$search%'";
+}
+if ($filter && $filter !== 'material') {
+  $material_query .= " AND 1=0";
+}
+$material_query .= " ORDER BY id DESC";
+$material_result = mysqli_query($conn, $material_query);
 
-$result3 = mysqli_query($conn, $query3);
 
-// Fetch images for category 2 (INDUSTRIAL)
-$query4 = "SELECT id, description, image_data FROM images WHERE category = 4 ORDER BY id DESC";
 
-$result4 = mysqli_query($conn, $query4);
+
 ?>
 
 <!DOCTYPE html>
@@ -54,6 +61,8 @@ $result4 = mysqli_query($conn, $query4);
     <title>Noble Home - Modern Furnishing Supplies</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com?plugins=aspect-ratio"></script>
+
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
@@ -158,8 +167,8 @@ $result4 = mysqli_query($conn, $query4);
         <div
             x-data="{
             images: [
-                'img/promotion/1.png',
-                'img/promotion/2.png',
+                'img/promo/1.png',
+                'img/promo/a.png',
                 'img/marine/marine1/c.png'
             ],
             current: 0,
@@ -212,158 +221,97 @@ $result4 = mysqli_query($conn, $query4);
                 <h2 class="text-4xl font-bold text-white mb-4">Our Products</h2>
                 <p class="text-white max-w-2xl mx-auto">Discover our wide range of quality materials and furniture for your home and construction needs.</p>
             </div>
+<form method="GET" action="#products" class="max-w-2xl mx-auto mb-10">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <button type="submit" class="bg-orange-500 text-white px-4 py-2 font-semibold rounded">
+      Search
+    </button>
+    <!-- Search Input -->
+    <input
+      type="text"
+      name="search"
+      placeholder="Search products..."
+      value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+      class="px-4 py-2 border rounded w-full"
+    />
 
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-orange-500 mb-4">Furniture</h2>
-            </div>
+    <!-- Filter Dropdown -->
+    <select name="filter" class="px-4 py-2 border rounded w-full">
+      <option value="">All Categories</option>
+      <option value="furniture" <?= ($_GET['filter'] ?? '') === 'furniture' ? 'selected' : '' ?>>Furniture</option>
+      <option value="material" <?= ($_GET['filter'] ?? '') === 'material' ? 'selected' : '' ?>>Material</option>
+    </select>
 
-            <!-- Featured Products -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/a.png" alt="Cement Bags" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/b.png" alt="Steel Bars" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/c.png" alt="Dining Set" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/d.png" alt="Hollow Blocks" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/e.png" alt="Office Chair" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/f.png" alt="Paint Buckets" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/g.png" alt="Cement Bags" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/h.png" alt="Steel Bars" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/i.png" alt="Dining Set" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/a.png" alt="Hollow Blocks" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/b.png" alt="Office Chair" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-4 card-hover text-center">
-                    <img src="img/yero/c.png" alt="Paint Buckets" class="w-16 h-16 object-cover rounded-lg mx-auto mb-3">
-
-                    <p class="text-orange-600 font-semibold text-sm">Not Available For Now</p>
-                </div>
-            </div>
-
-<section class="p-3">
-    <div class="mb-12 mt-10">
-        <h2 class="text-4xl font-bold text-orange-500 mb-4">Flutted</h2>
-         <div class="relative -bottom-2 left-0 w-12 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
-    </div>
-    <div class="swiper mySwiper-indoor">
-        <div class="swiper-wrapper">
-            <?php while ($row = mysqli_fetch_assoc($indoor_result)) : ?>
-                <div class="swiper-slide bg-white rounded-lg shadow-md p-4 text-center">
-                    <a href="product_view.php?id=<?= $row['product_id'] ?>">
-                        <img src="data:image/jpeg;base64,<?= base64_encode($row['image']) ?>" class="w-[150px] h-[150px] object-contain mx-auto mb-3 rounded-lg hover:scale-105 transition" />
-                    </a>
-                    <p class="text-sm text-orange-600 font-bold "><?= htmlspecialchars($row['color']) ?></p>
-                    <p class="text-sm text-gray-600">Size: <?= htmlspecialchars($row['size']) ?></p>
-                </div>
-            <?php endwhile; ?>
-        </div>
-    </div>
-</section>
-
-<section class="p-3">
-    <div class="mb-12 mt-10">
-        <h2 class="text-4xl font-bold text-orange-500 mb-4">MARINE</h2>
-         <div class="relative -bottom-2 left-0 w-12 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
-    </div>
-    <div class="swiper mySwiper-marine">
-        <div class="swiper-wrapper">
-            <?php while ($row = mysqli_fetch_assoc($marine_result)) : ?>
-                <div class="swiper-slide bg-white rounded-lg shadow-md p-4 text-center">
-                    <a href="product_view.php?id=<?= $row['product_id'] ?>">
-                        <img src="data:image/jpeg;base64,<?= base64_encode($row['image']) ?>" class="w-[150px] h-[150px] object-contain mx-auto mb-3 rounded-lg hover:scale-105 transition" />
-                    </a>
-                    <p class="text-orange-600 font-semibold text-sm"><?= htmlspecialchars($row['product_name']) ?></p>
-                    <p class="text-sm text-gray-600">Color: <?= htmlspecialchars($row['color']) ?></p>
-                    <p class="text-sm text-gray-600">Size: <?= htmlspecialchars($row['size']) ?></p>
-                </div>
-            <?php endwhile; ?>
-        </div>
-    </div>
-</section>
+  
+  </div>
+</form>
 
 
 
-            <!-- SECTION: INDUSTRIAL -->
             <section class="p-3">
                 <div class="mb-12 mt-10">
-                    <h2 class="text-4xl font-bold text-orange-500 mb-4">UV Board</h2>
-                     <div class="relative -bottom-2  w-12 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+                    <h2 class="text-4xl font-bold text-orange-500 mb-4">Furniture</h2>
+                    <div class="relative -bottom-2 left-0 w-15 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
                 </div>
 
-                <div class="swiper mySwiper">
+                <div class="swiper mySwiper-indoor">
                     <div class="swiper-wrapper">
-                        <?php while ($row = mysqli_fetch_assoc($result4)) : ?>
-                            <div class="swiper-slide bg-white rounded-lg shadow-md p-4 text-center">
-                                <a href="image_detail.php?id=<?= $row['id'] ?>">
-                                    <img src="data:image/jpeg;base64,<?= base64_encode($row['image_data']) ?>"
-                                        alt="<?= isset($row['description']) ? htmlspecialchars($row['description']) : '' ?>"
-                                        class="w-[150px] h-[150px] object-contain mx-auto mb-3 rounded-lg hover:scale-105 transition" />
+                        <?php while ($row = mysqli_fetch_assoc($SYCJ_result)) : ?>
+                            <div class="swiper-slide">
+                                <a href="product_view.php?id=<?= (int)$row['id'] ?>" class="bg-gray-300 rounded-lg shadow p-2 group block text-center w-full">
+                                    <!-- Image Container with Aspect Ratio -->
+                                    <div class="w-full aspect-[4/5] mb-2">
+                                        <?php if (!empty($row['main_image'])): ?>
+                                            <img
+                                                src="data:image/jpeg;base64,<?= base64_encode($row['main_image']) ?>"
+                                                class="w-full h-full object-contain rounded group-hover:scale-105 transition-transform duration-300 mx-auto"
+                                                alt="<?= htmlspecialchars($row['product_name']) ?>" />
+                                        <?php else: ?>
+                                            <div class="w-full h-full flex items-center justify-center bg-gray-200 rounded text-gray-500 text-xs">No Image</div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <!-- Product Name -->
+                                    <h2 class="text-sm bg-red-900 font-semibold text-white rounded-lg p-3 break-words"><?= htmlspecialchars($row['product_name']) ?></h2>
                                 </a>
-                                <p class="text-orange-600 font-semibold text-sm">
-                                    <?= isset($row['description']) ? htmlspecialchars($row['description']) : 'No description' ?>
-                                </p>
                             </div>
                         <?php endwhile; ?>
                     </div>
                 </div>
             </section>
 
+
+            <section class="p-3">
+                <div class="mb-12 mt-10">
+                    <h2 class="text-4xl font-bold text-orange-500 mb-4">Material</h2>
+                    <div class="relative -bottom-2 left-0 w-15 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+                </div>
+
+                <div class="swiper mySwiper-material">
+                    <div class="swiper-wrapper">
+                        <?php while ($row = mysqli_fetch_assoc($material_result)) : ?>
+                            <div class="swiper-slide">
+                                <a href="product_view.php?id=<?= (int)$row['id'] ?>" class="bg-white border rounded-lg shadow p-2 group block text-center w-full">
+                                    <!-- Image Container with Aspect Ratio -->
+                                    <div class="w-full aspect-[4/5] mb-2">
+                                        <?php if (!empty($row['main_image'])): ?>
+                                            <img
+                                                src="data:image/jpeg;base64,<?= base64_encode($row['main_image']) ?>"
+                                                class="w-full h-full object-contain rounded group-hover:scale-105 transition-transform duration-300 mx-auto"
+                                                alt="<?= htmlspecialchars($row['product_name']) ?>" />
+                                        <?php else: ?>
+                                            <div class="w-full h-full flex items-center justify-center bg-gray-200 rounded text-gray-500 text-xs">No Image</div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <h2 class="text-sm bg-red-900 font-semibold text-white rounded-lg p-3 break-words"><?= htmlspecialchars($row['product_name']) ?></h2>
+                                </a>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
+                </div>
+            </section>
         </div>
     </section>
-
-
-
 
     <!-- About Section -->
     <section id="about" class="py-16 bg-white mt-10">
@@ -389,7 +337,7 @@ $result4 = mysqli_query($conn, $query4);
     </section>
 
 
-    <section>
+    <section class="p-3">
         <div class="relative flex flex-col-reverse lg:flex-row items-center justify-between max-w-7xl mx-auto px-6 z-20">
             <!-- Left Side: Image -->
             <div class="w-full lg:w-1/2 flex justify-center mb-10 lg:mb-0">
@@ -442,10 +390,8 @@ $result4 = mysqli_query($conn, $query4);
                         </div>
                     </div>
 
-                    <!-- Explore Button -->
-                    <button class="group bg-white/10 backdrop-blur-sm border border-white/30 text-white px-8 py-3 rounded-full font-semibold text-lg hover:bg-white/20 hover:border-white/50 transition-all duration-300">
-                        Explore
-                    </button>
+                   
+             
                 </div>
             </div>
         </div>
@@ -667,37 +613,45 @@ $result4 = mysqli_query($conn, $query4);
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new Swiper('.mySwiper-indoor', {
+                slidesPerView: 2,
+                spaceBetween: 15,
+                autoplay: {
+                    delay: 2500,
+                    disableOnInteraction: false,
+                },
+                loop: true,
+                breakpoints: {
+                    768: {
+                        slidesPerView: 3
+                    },
+                    1024: {
+                        slidesPerView: 4
+                    },
+                },
+            });
+        });
 
-  new Swiper('.mySwiper-indoor', {
-    slidesPerView: 2,
-    spaceBetween: 20,
-    autoplay: {
-      delay: 2500, // 2.5 seconds per slide
-      disableOnInteraction: false, // keep autoplay after user interaction
-    },
-    loop: true, // makes the swiper loop back to the beginning
-    breakpoints: {
-      768: { slidesPerView: 3 },
-      1024: { slidesPerView: 4 },
-    },
-  });
-
-  new Swiper('.mySwiper-marine', {
-    slidesPerView: 2,
-    spaceBetween: 20,
-    autoplay: {
-      delay: 2500,
-      disableOnInteraction: false,
-    },
-
-    loop: true,
-    breakpoints: {
-      768: { slidesPerView: 4 },
-      1024: { slidesPerView: 5 },
-    },
-
-  });
-
+        document.addEventListener('DOMContentLoaded', function() {
+            new Swiper('.mySwiper-material', {
+                slidesPerView: 2,
+                spaceBetween: 15,
+                autoplay: {
+                    delay: 2500,
+                    disableOnInteraction: false,
+                },
+                loop: true,
+                breakpoints: {
+                    768: {
+                        slidesPerView: 3
+                    },
+                    1024: {
+                        slidesPerView: 4
+                    },
+                },
+            });
+        });
 
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {

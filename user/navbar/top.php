@@ -4,7 +4,11 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<style>[x-cloak] { display: none !important; }</style>
+<style>
+  [x-cloak] {
+    display: none !important;
+  }
+</style>
 
 <!-- Navigation -->
 <nav x-data="{ mobileOpen: false }" class="bg-white shadow-lg sticky top-0 z-50 text-black font-bold">
@@ -57,18 +61,18 @@
         <a href="about" class="<?= $current_page == 'about' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition">About</a>
         <a href="contact" class="<?= $current_page == 'contact' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition">Contact </a>
         <a href="shop" class="<?= $current_page == 'shop' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition inline-flex items-center gap-1">
-  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l1 11a1 1 0 001 1h14a1 1 0 001-1l1-11M4 9V7a1 1 0 011-1h14a1 1 0 011 1v2M9 22V12h6v10" />
-  </svg>
-  Shop
-</a>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l1 11a1 1 0 001 1h14a1 1 0 001-1l1-11M4 9V7a1 1 0 011-1h14a1 1 0 011 1v2M9 22V12h6v10" />
+          </svg>
+          Shop
+        </a>
 
-<a href="cart/cart_view" class="<?= $current_page == 'cart/cart_view' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition inline-flex items-center gap-1">
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7a1 1 0 00.9 1.5h11.1M16 21a1 1 0 100-2 1 1 0 000 2zm-8 0a1 1 0 100-2 1 1 0 000 2z" />
-  </svg>
-  Cart
-</a>
+        <a href="cart/cart_view" class="<?= $current_page == 'cart/cart_view' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition inline-flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7a1 1 0 00.9 1.5h11.1M16 21a1 1 0 100-2 1 1 0 000 2zm-8 0a1 1 0 100-2 1 1 0 000 2z" />
+          </svg>
+          Cart
+        </a>
 
       </div>
 
