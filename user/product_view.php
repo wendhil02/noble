@@ -3,8 +3,22 @@ include '../connection/connect.php';
 
 $product_id = $_GET['id'] ?? 0;
 
-// Get product info
-$product = $conn->query("SELECT * FROM products WHERE id = $product_id")->fetch_assoc();
+if (!$product_id || !is_numeric($product_id)) {
+  echo "Invalid product ID.";
+  exit;
+}
+
+// ✅ Fetch product including description
+$query = "SELECT id, product_name, codename, quantity, price, main_image, description FROM products WHERE id = $product_id LIMIT 1";
+$result = mysqli_query($conn, $query);
+$product = mysqli_fetch_assoc($result);
+
+if (!$product) {
+  echo "Product not found.";
+  exit;
+}
+
+// ✅ Fetch product types
 $types = $conn->query("SELECT * FROM product_types WHERE product_id = $product_id");
 
 $type_variant_map = [];
@@ -21,17 +35,8 @@ foreach ($types as $type) {
   $type_variant_map[$type_name] = $variants->fetch_all(MYSQLI_ASSOC);
 }
 
-
-$query = "SELECT * FROM products WHERE id = $product_id LIMIT 1";
-$result = mysqli_query($conn, $query);
-$product = mysqli_fetch_assoc($result);
-
-if (!$product) {
-    echo "Product not found.";
-    exit;
-}
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -104,10 +109,19 @@ if (!$product) {
         <div class="bg-white px-4 py-10 lg:px-12 max-w-4xl mx-auto">
           <!-- Image Container -->
           <div class="aspect-square w-[300px] sm:w-[400px] md:w-[500px] mx-auto relative overflow-hidden rounded-xl shadow-lg bg-white">
+
+            <!-- Product Image -->
             <img
               src="data:image/jpeg;base64,<?= base64_encode($product['main_image']) ?>"
               class="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
               alt="<?= htmlspecialchars($product['product_name']) ?>" />
+
+            <!-- Triangle Icon in Top-Left -->
+            <div class="absolute top-0 left-0 w-12 h-12 z-10">
+              <div class="w-12 h-12 bg-blue-400 clip-triangle relative">
+                <img src="img/icon/b.png" alt="Check Icon" class="absolute top-1.5 left-1.5 w-5 h-5 object-contain" />
+              </div>
+            </div>
 
             <!-- Featured Badge -->
             <div class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -115,18 +129,24 @@ if (!$product) {
             </div>
           </div>
 
-          <!-- Description Section -->
-          <div class="mt-6 text-center">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">
-              <?= htmlspecialchars($product['product_name']) ?>
-            </h2>
-            <p class="text-gray-600 text-sm leading-relaxed">
-              <?= !empty($product['description']) ? nl2br(htmlspecialchars($product['description'])) : 'No description available.' ?>
-            </p>
-          </div>
+<!-- Description Section -->
+<div class="mt-6 text-center">
+  <h2 class="text-2xl font-bold text-gray-800 mb-2">
+    <?= htmlspecialchars($product['product_name']) ?>
+  </h2>
+  <p class="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+    <?= !empty($product['description']) ? htmlspecialchars($product['description']) : 'No description available.' ?>
+  </p>
+</div>
+
         </div>
 
-
+        <!-- Clip path style for triangle -->
+        <style>
+          .clip-triangle {
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+          }
+        </style>
 
         <!-- Product Info Section -->
         <div class="p-8 lg:p-12 space-y-8">
@@ -198,42 +218,61 @@ if (!$product) {
 
             <?php foreach ($type_names as $index => $type_name): ?>
               <div id="variants-<?= $index ?>" class="variant-group hidden fade-in">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <?php foreach ($type_variant_map[$type_name] as $variant): ?>
-                    <button
-                      type="button"
-                      onclick="selectVariant(this, '<?= addslashes($variant['color']) ?>')"
-                      class="variant-btn variant-hover group relative bg-white border-2 border-gray-200 rounded-xl p-4 hover:border-orange-300 hover:shadow-lg transition-all duration-300"
-                      data-price="<?= $variant['price'] ?>"
-                      data-percent="<?= $variant['percent'] ?>">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+       <?php foreach ($type_variant_map[$type_name] as $variant): 
+  $price = floatval($variant['price']);
+  $percent = floatval($variant['percent']);
+  $discount = floatval($variant['discount'] ?? 0);
 
-                      <div class="aspect-square bg-gray-50 rounded-lg mb-3 overflow-hidden">
-                        <img
-                          src="data:image/jpeg;base64,<?= base64_encode($variant['image']) ?>"
-                          class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                          alt="<?= htmlspecialchars($variant['color']) ?>" />
-                      </div>
+  $priceWithMarkup = $price + ($price * $percent / 100);
+  $finalPrice = $priceWithMarkup - ($priceWithMarkup * $discount / 100);
+?>
+  <button
+    type="button"
+    onclick="selectVariant(this, '<?= addslashes($variant['color']) ?>')"
+    class="variant-btn variant-hover group relative bg-white border-2 border-gray-200 rounded-xl p-4 hover:border-orange-300 hover:shadow-lg transition-all duration-300"
+    data-price="<?= $price ?>"
+    data-percent="<?= $percent ?>"
+    data-discount="<?= $discount ?>"
+  >
+    <div class="aspect-square bg-gray-50 rounded-lg mb-3 overflow-hidden">
+      <img
+        src="data:image/jpeg;base64,<?= base64_encode($variant['image']) ?>"
+        class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+        alt="<?= htmlspecialchars($variant['color']) ?>" />
+    </div>
 
-                      <div class="text-center space-y-1 break-words">
-                        <span class="block text-sm font-semibold text-gray-800">
-                          <?= htmlspecialchars($variant['color']) ?>
-                        </span>
-                        <span class="block text-xs text-gray-500 font-medium">
-                          <?= htmlspecialchars($variant['size']) ?>
-                        </span>
-                            <span class="block text-md text-red-500 font-medium">₱<?= htmlspecialchars($variant['price']) ?>
-                        </span>
-                      </div>
+    <div class="text-center space-y-1 break-words">
+      <span class="block text-sm font-semibold text-gray-800">
+        <?= htmlspecialchars($variant['color']) ?>
+      </span>
+      <span class="block text-xs text-gray-500 font-medium">
+        <?= htmlspecialchars($variant['size']) ?>
+      </span>
 
-                      <!-- Selection check -->
-                      <div class="absolute top-2 right-2 w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center opacity-0 transition-opacity">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                      </div>
-                    </button>
-                  <?php endforeach; ?>
-                </div>
+      <!-- Markup and Discount Breakdown -->
+  
+      <!-- Final Price -->
+      <?php if ($discount > 0): ?>
+        <span class="block text-xs text-gray-400 line-through">₱<?= number_format($priceWithMarkup, 2) ?></span>
+        <span class="block text-md text-red-500 font-semibold">₱<?= number_format($finalPrice, 2) ?></span>
+        <div class="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">
+          <?= number_format($discount, 0) ?>% OFF
+        </div>
+      <?php else: ?>
+        <span class="block text-md text-gray-800 font-medium">₱<?= number_format($finalPrice, 2) ?></span>
+      <?php endif; ?>
+    </div>
+
+    <!-- Selection check -->
+    <div class="absolute top-2 right-2 w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center opacity-0 transition-opacity">
+      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+      </svg>
+    </div>
+  </button>
+<?php endforeach; ?>
+
               </div>
             <?php endforeach; ?>
           </div>
@@ -252,7 +291,7 @@ if (!$product) {
                     <p class="text-sm text-gray-600 mb-1">Total Price</p>
                     <p id="totalPrice" class="text-3xl font-bold text-green-600">₱0.00</p>
                   </div>
-             
+
                 </div>
               </div>
 
@@ -276,10 +315,11 @@ if (!$product) {
     const groups = document.querySelectorAll('.variant-group');
     const productQuantity = <?= intval($product['quantity']) ?>;
     const basePrice = <?= $product['price'] !== null ? floatval($product['price']) : 0 ?>;
-    let selectedVariantData = {
-      price: 0,
-      percent: 0
-    };
+let selectedVariantData = {
+  price: 0,
+  percent: 0,
+  discount: 0
+};
 
     function showVariants(index, typeName) {
       // Hide all variant groups
@@ -324,26 +364,29 @@ if (!$product) {
       document.getElementById('selected_variant').value = variantColor;
 
       // Update price data
-      selectedVariantData.price = parseFloat(button.dataset.price);
-      selectedVariantData.percent = parseFloat(button.dataset.percent);
+     selectedVariantData.price = parseFloat(button.dataset.price);
+selectedVariantData.percent = parseFloat(button.dataset.percent);
+selectedVariantData.discount = parseFloat(button.dataset.discount);
+
       updateTotalPrice();
     }
 
-    function updateTotalPrice() {
-      const variantPrice = selectedVariantData.price || 0;
-      const percentMarkup = selectedVariantData.percent || 0;
+function updateTotalPrice() {
+  const variantPrice = selectedVariantData.price || 0;
+  const percentMarkup = selectedVariantData.percent || 0;
+  const discount = selectedVariantData.discount || 0;
 
-      // Apply percent on variant price
-      const priceWithPercent = variantPrice + (variantPrice * percentMarkup / 100);
+  const priceWithPercent = variantPrice + (variantPrice * percentMarkup / 100);
+  const priceWithDiscount = priceWithPercent - (priceWithPercent * discount / 100);
+  const total = priceWithDiscount * productQuantity;
 
-      // Multiply by quantity from products table
-      const total = priceWithPercent * productQuantity;
+  document.getElementById('totalPrice').textContent = '₱' + total.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
 
-      document.getElementById('totalPrice').textContent = '₱' + total.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
+
   </script>
 </body>
 

@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Get the type_id using type_name and product_id
+    // Get type_id
     $type_stmt = $conn->prepare("SELECT id FROM product_types WHERE product_id = ? AND type_name = ?");
     $type_stmt->bind_param("is", $product_id, $selected_type);
     $type_stmt->execute();
@@ -40,9 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $type_id = $type_data['id'];
 
-    // Get variant price and percent
-$variant_stmt = $conn->prepare("SELECT price, percent, image FROM product_variants WHERE type_id = ? AND color = ?");
-$variant_stmt->bind_param("is", $type_id, $selected_variant);
+    // Get variant data
+    $variant_stmt = $conn->prepare("SELECT price, percent, discount, image FROM product_variants WHERE type_id = ? AND color = ?");
+    $variant_stmt->bind_param("is", $type_id, $selected_variant);
     $variant_stmt->execute();
     $variant_result = $variant_stmt->get_result();
     $variant = $variant_result->fetch_assoc();
@@ -55,11 +55,13 @@ $variant_stmt->bind_param("is", $type_id, $selected_variant);
 
     $variant_price = floatval($variant['price']);
     $percent = floatval($variant['percent']);
+    $discount = floatval($variant['discount']);
     $bundle_quantity = intval($product['quantity']);
 
-    // Calculate final price: (variant_price + percent) * quantity
+    // Calculation
     $price_with_markup = $variant_price + ($variant_price * $percent / 100);
-    $final_price = $price_with_markup * $bundle_quantity;
+    $price_with_discount = $price_with_markup - ($price_with_markup * $discount / 100);
+    $final_price = $price_with_discount * $bundle_quantity;
 
     // Generate cart key
     $cart_key = $product_id . '_' . $selected_type . '_' . $selected_variant;
@@ -69,16 +71,13 @@ $variant_stmt->bind_param("is", $type_id, $selected_variant);
         $_SESSION['cart'] = [];
     }
 
+    // Encode image if exists
+    $base64_image = '';
+    if (!empty($variant['image'])) {
+        $base64_image = base64_encode($variant['image']);
+    }
 
-    $image_data = $variant['image'];
-
-// Convert image to base64
-$base64_image = '';
-if ($image_data) {
-    $base64_image = base64_encode($image_data);
-}
-
-    // Add to cart or update quantity
+    // Add or update cart
     if (!isset($_SESSION['cart'][$cart_key])) {
         $_SESSION['cart'][$cart_key] = [
             'product_id' => $product_id,
@@ -88,7 +87,8 @@ if ($image_data) {
             'variant' => $selected_variant,
             'price' => $final_price,
             'quantity' => 1,
-            'image' => $base64_image
+            'image' => $base64_image,
+            'discount' => $discount
         ];
     } else {
         $_SESSION['cart'][$cart_key]['quantity'] += 1;

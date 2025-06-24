@@ -11,12 +11,22 @@ $SYCJ_query = "
 ";
 $SYCJ_result = mysqli_query($conn, $SYCJ_query);
 
-$material_query = "
-    SELECT * FROM products
-    WHERE codename = 'material'
-    ORDER BY id DESC
+
+$material_querys = "
+SELECT 
+    pv.*, 
+    pt.type_name, 
+    pt.product_id
+FROM 
+    product_variants pv
+JOIN 
+    product_types pt ON pv.type_id = pt.id
+WHERE 
+    pv.discount > 0
+ORDER BY 
+    pv.percent ASC
 ";
-$material_result = mysqli_query($conn, $material_query);
+$material_results = mysqli_query($conn, $material_querys);
 
 
 
@@ -36,6 +46,7 @@ if ($filter && $filter !== 'furniture') {
 $furniture_query .= " ORDER BY id DESC";
 $SYCJ_result = mysqli_query($conn, $furniture_query);
 
+
 // Material Query
 $material_query = "SELECT * FROM products WHERE codename = 'material'";
 if ($search) {
@@ -49,9 +60,20 @@ $material_result = mysqli_query($conn, $material_query);
 
 $discount_result = mysqli_query(
     $conn,
-    "SELECT * FROM product_variants ORDER BY percent ASC"
+    "SELECT * FROM product_variants WHERE discount IS NULL OR discount = 0 ORDER BY percent ASC"
 );
 
+// handle filtering
+$filter = $_GET['filter'] ?? 'all';
+
+if ($filter === 'all') {
+    $query = "SELECT * FROM products ORDER BY id DESC";
+} else {
+    $safe_filter = mysqli_real_escape_string($conn, $filter);
+    $query = "SELECT * FROM products WHERE codename = '$safe_filter' ORDER BY id DESC";
+}
+
+$result = mysqli_query($conn, $query);
 
 ?>
 
@@ -158,10 +180,19 @@ $discount_result = mysqli_query(
         [x-cloak] {
             display: none !important;
         }
+
+        /* No @apply: use classes directly in HTML */
+        .filter-tab {
+            /* Placeholder for custom styles if needed */
+        }
+
+        .active-tab {
+            /* Placeholder for custom styles if needed */
+        }
     </style>
 </head>
 
-<body class="bg-gray-900">
+<body class="">
 
     <?php include 'navbar/top.php'; ?>
 
@@ -171,7 +202,7 @@ $discount_result = mysqli_query(
             x-data="{
             images: [
                 'img/promo/1.png',
-                'img/promo/a.png',
+                'img/promo/2.png',
                 'img/marine/marine1/c.png'
             ],
             current: 0,
@@ -186,7 +217,7 @@ $discount_result = mysqli_query(
             class="relative w-full">
 
             <!-- Image Container with Slide -->
-            <div class="w-full h-[300px] md:h-[500px] overflow-hidden relative">
+            <div class="w-full h-[200px] md:h-[500px] overflow-hidden relative">
                 <div
                     class="flex transition-transform duration-700 ease-in-out"
                     :style="'transform: translateX(-' + (current * 100) + '%)'">
@@ -215,6 +246,7 @@ $discount_result = mysqli_query(
             </button>
         </div>
     </section>
+
     <section class="bg-gradient-to-r from-orange-500 to-red-500 text-white py-1 px-2 shadow-md">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
 
@@ -237,13 +269,12 @@ $discount_result = mysqli_query(
         </div>
     </section>
 
-
     <section class="bg-white shadow-md py-4 px-6">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
 
             <!-- Inquire Block -->
-            <a href="inquire.php" class="flex-1 bg-orange-100 hover:bg-orange-200 transition rounded-lg p-4 text-center">
-                <h3 class="text-lg font-semibold text-orange-700">📩 Inquire</h3>
+            <a href="inquire.php" class="flex-1 hover:bg-orange-200 transition rounded-lg p-4 text-center">
+                <h3 class="text-lg font-semibold text-orange-700">Inquire</h3>
                 <p class="text-sm text-gray-700">Send us a question or message.</p>
             </a>
 
@@ -251,23 +282,20 @@ $discount_result = mysqli_query(
             <div class="hidden md:block w-px bg-gray-300 h-10 mx-4"></div>
 
             <!-- Appointment Block -->
-            <a href="appointment.php" class="flex-1 bg-orange-100 hover:bg-orange-200 transition rounded-lg p-4 text-center">
-                <h3 class="text-lg font-semibold text-orange-700">📅 Appointment</h3>
+            <a href="appointment.php" class="flex-1  hover:bg-orange-200 transition rounded-lg p-4 text-center">
+                <h3 class="text-lg font-semibold text-orange-700">Appointment</h3>
                 <p class="text-sm text-gray-700">Book a consultation now.</p>
             </a>
 
         </div>
     </section>
 
-
-
-
     <!-- Products Section -->
     <section id="products" class="py-20">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-white mb-4">Our Products</h2>
-                <p class="text-white max-w-2xl mx-auto">Discover our wide range of quality materials and furniture for your home and construction needs.</p>
+            <div class="text-center mb-12 text-black">
+                <h2 class="text-4xl font-bold mb-4">Products</h2>
+                <p class=" max-w-2xl mx-auto">Discover our wide range of quality materials and furniture for your home and construction needs.</p>
             </div>
             <form method="GET" action="#products" class="max-w-2xl mx-auto mb-10">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -323,7 +351,7 @@ $discount_result = mysqli_query(
                                 </h3>
                                 <p class="text-[11px] text-gray-600">₱<?= number_format($v['price'], 2) ?></p>
                                 <span class="inline-block mt-1 text-[11px] px-2 py-[1px] bg-green-100 text-green-600 rounded">
-                                    -<?= $v['percent'] ?>%
+                                    <?= $v['percent'] ?>%
                                 </span>
                             </div>
                         <?php endwhile; ?>
@@ -338,66 +366,216 @@ $discount_result = mysqli_query(
                     <div class="relative -bottom-2 left-0 w-15 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
                 </div>
 
+                <!-- Filter Buttons -->
+                <div class="flex gap-3 mb-6 flex-wrap justify-center">
+                    <?php
+                    $filters = ['all' => 'All', 'tv' => 'TV', 'table' => 'Table', 'sofa' => 'Sofa', 'cabinet' => 'Cabinet'];
+                    foreach ($filters as $key => $label):
+                        $isActive = ($filter === $key) ? 'bg-orange-500 text-black' : 'text-black hover:bg-orange-500 hover:text-black';
+                    ?>
+                        <a href="?filter=<?= $key ?>" class="px-4 py-1 rounded-full border text-sm border-orange-500 transition <?= $isActive ?>">
+                            <?= $label ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
 
+
+                <!-- Swiper Slider -->
                 <div class="swiper mySwiper-indoor">
-                    <div class="swiper-wrapper">
-                        <?php while ($row = mysqli_fetch_assoc($SYCJ_result)) : ?>
+                    <div class="swiper-wrapper p-2">
+                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                             <div class="swiper-slide">
-                                <a href="product_view.php?id=<?= (int)$row['id'] ?>" class="bg-gray-300 rounded-lg shadow p-2 group block text-center w-full">
-                                    <!-- Image Container with Aspect Ratio -->
-                                    <div class="w-full aspect-[4/5] mb-2">
+                                <a href="product_view.php?id=<?= (int)$row['id'] ?>"
+                                    class="flex flex-col justify-between h-[330px] bg-white rounded-lg shadow-lg p-2 group text-center w-full relative">
+
+                                    <!-- Green Icon Bubble -->
+                                    <div class="absolute top-0 left-0 w-12 h-12 z-10 flex items-start justify-start overflow-visible">
+                                        <div class="w-12 h-12 bg-blue-400 clip-triangle relative">
+                                            <img src="img/icon/b.png" alt="Check Icon" class="absolute top-1 left-1 w-5 h-5 object-contain" />
+                                        </div>
+                                    </div>
+
+                                    <style>
+                                        .clip-triangle {
+                                            clip-path: polygon(0 0, 100% 0, 0 100%);
+                                        }
+                                    </style>
+
+                                    <!-- Image -->
+                                    <div class="w-full aspect-square mb-2">
                                         <?php if (!empty($row['main_image'])): ?>
-                                            <img
-                                                src="data:image/jpeg;base64,<?= base64_encode($row['main_image']) ?>"
-                                                class="w-full h-full object-contain rounded group-hover:scale-105 transition-transform duration-300 mx-auto"
+                                            <img src="data:image/jpeg;base64,<?= base64_encode($row['main_image']) ?>"
+                                                class="w-full h-full object-contain bg-gray-100 rounded group-hover:scale-105 transition-transform duration-300 mx-auto"
                                                 alt="<?= htmlspecialchars($row['product_name']) ?>" />
                                         <?php else: ?>
-                                            <div class="w-full h-full flex items-center justify-center bg-gray-200 rounded text-gray-500 text-xs">No Image</div>
+                                            <div class="w-full h-full flex items-center justify-center bg-gray-200 rounded text-gray-500 text-xs">
+                                                No Image
+                                            </div>
                                         <?php endif; ?>
                                     </div>
-                                    <!-- Product Name -->
-                                    <h2 class="text-xs  bg-red-900 font-semibold text-white rounded-lg px-3 py-2 text-center break-words">
-                                        <?= htmlspecialchars($row['product_name']) ?>
-                                    </h2>
 
+                                    <!-- Name & Description (footer area) -->
+                                    <div class="mt-auto">
+                                        <h2 class="text-xs font-semibold text-gray-800 text-center break-words mb-1">
+                                            <?= htmlspecialchars($row['product_name']) ?>
+                                        </h2>
+
+                                        <?php if (!empty($row['description'])): ?>
+                                            <p class="text-[10px] text-gray-600 leading-snug line-clamp-2 h-8 overflow-hidden">
+                                                <?= htmlspecialchars($row['description']) ?>
+                                            </p>
+                                        <?php else: ?>
+                                            <p class="text-[10px] text-gray-400 italic h-8">No description.</p>
+                                        <?php endif; ?>
+                                    </div>
                                 </a>
                             </div>
                         <?php endwhile; ?>
                     </div>
                 </div>
+
             </section>
 
-
-            <section class="p-3">
-                <div class="mb-12 mt-10">
-                    <h2 class="text-4xl font-bold text-orange-500 mb-4">Material</h2>
-                    <div class="relative -bottom-2 left-0 w-15 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+            <section class="px-4 py-10">
+                <!-- Header -->
+                <div class="text-center mb-10">
+                    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight">Top Sales</h2>
+                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
                 </div>
 
+                <!-- Swiper Container -->
                 <div class="swiper mySwiper-material">
                     <div class="swiper-wrapper">
-                        <?php while ($row = mysqli_fetch_assoc($material_result)) : ?>
-                            <div class="swiper-slide">
-                                <a href="product_view.php?id=<?= (int)$row['id'] ?>" class="bg-white border rounded-lg shadow p-2 group block text-center w-full">
-                                    <!-- Image Container with Aspect Ratio -->
-                                    <div class="w-full aspect-[4/5] mb-2">
-                                        <?php if (!empty($row['main_image'])): ?>
+                        <?php while ($row = mysqli_fetch_assoc($material_results)) : ?>
+                            <?php
+                            $base = (float)$row['price'];
+                            $percent = (float)($row['percent'] ?? 0);
+                            $discount = (float)($row['discount'] ?? 0);
+
+                            $priceWithMarkup = $base + ($base * $percent / 100);
+                            $finalPrice = $priceWithMarkup - ($priceWithMarkup * $discount / 100);
+                            ?>
+                            <div class="swiper-slide p-2">
+                                <div class="bg-white rounded-xl shadow-lg p-4 group hover:shadow-xl transition duration-300 flex flex-col justify-between h-[480px] text-center relative">
+
+                                    <!-- Triangle Badge -->
+                                    <div class="absolute top-0 left-0 z-10">
+                                        <div class="w-12 h-12 bg-red-400 clip-triangle relative">
+                                            <img src="img/icon/b.png" alt="Icon" class="absolute top-1 left-1 w-5 h-5 object-contain" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Image -->
+                                    <div class="aspect-square w-full bg-gray-50 border border-gray-200 rounded-lg overflow-hidden mb-4">
+                                        <?php if (!empty($row['image'])): ?>
                                             <img
-                                                src="data:image/jpeg;base64,<?= base64_encode($row['main_image']) ?>"
-                                                class="w-full h-full object-contain rounded group-hover:scale-105 transition-transform duration-300 mx-auto"
-                                                alt="<?= htmlspecialchars($row['product_name']) ?>" />
+                                                src="data:image/jpeg;base64,<?= base64_encode($row['image']) ?>"
+                                                class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                                                alt="<?= htmlspecialchars($row['namevariant']) ?>" />
                                         <?php else: ?>
-                                            <div class="w-full h-full flex items-center justify-center bg-gray-200 rounded text-gray-500 text-xs">No Image</div>
+                                            <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
                                         <?php endif; ?>
                                     </div>
 
-                                    <h2 class="text-sm bg-red-900 font-semibold text-white rounded-lg p-3 break-words"><?= htmlspecialchars($row['product_name']) ?></h2>
-                                </a>
+                                    <!-- Info -->
+                                    <div class="mt-auto">
+                                        <h3 class="text-base font-semibold text-gray-800 leading-snug break-words">
+                                            <?= htmlspecialchars($row['namevariant']) ?>
+                                        </h3>
+                                        <p class="text-sm text-gray-500 mb-1">
+                                            <?= htmlspecialchars($row['color']) ?> — <?= htmlspecialchars($row['size']) ?>
+                                        </p>
+
+                                        <!-- Price Display -->
+                                        <?php if ($discount > 0): ?>
+                                            <p class="text-sm text-gray-400 line-through">₱<?= number_format($priceWithMarkup, 2) ?></p>
+                                            <p class="text-base text-green-600 font-bold">
+                                                ₱<?= number_format($finalPrice, 2) ?>
+                                                <span class="text-sm text-red-500">-<?= number_format($discount, 0) ?>%</span>
+                                            </p>
+                                        <?php else: ?>
+                                            <p class="text-base text-green-600 font-bold mb-2">₱<?= number_format($priceWithMarkup, 2) ?></p>
+                                        <?php endif; ?>
+
+                                        <!-- Add to Cart -->
+                                        <form action="cart/add_to_cart.php" method="POST" class="mt-2">
+                                            <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
+                                            <input type="hidden" name="selected_type" value="<?= $row['type_name'] ?>">
+                                            <input type="hidden" name="selected_variant" value="<?= $row['color'] ?>">
+
+                                            <button
+                                                type="submit"
+                                                class="bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition">
+                                                Add to Cart
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         <?php endwhile; ?>
                     </div>
                 </div>
             </section>
+
+
+
+            <section class="p-5">
+                <!-- Header -->
+                <div class="mb-10 mt-10 text-center">
+                    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight">New Release </h2>
+                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+                </div>
+                <!-- Swiper Container -->
+                <div class="swiper mySwiper-material">
+                    <div class="swiper-wrapper">
+                        <?php while ($row = mysqli_fetch_assoc($material_results)) : ?>
+                            <div class="swiper-slide h-full p-2">
+                                <div class="bg-white rounded-xl shadow-lg p-4 group hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between h-[470px] w-full text-center">
+                                    <div class="absolute top-0 left-0 w-12 h-12 z-10 flex items-start justify-start overflow-visible">
+                                        <div class="w-12 h-12 bg-red-400 clip-triangle relative">
+                                            <img src="img/icon/b.png" alt="Check Icon" class="absolute top-1 left-1 w-5 h-5 object-contain" />
+                                        </div>
+                                    </div>
+                                    <!-- Image -->
+                                    <div class=" w-full aspect-square overflow-hidden rounded-lg bg-gray-50 border border-gray-200 mb-4">
+                                        <?php if (!empty($row['image'])): ?>
+                                            <img
+                                                src="data:image/jpeg;base64,<?= base64_encode($row['image']) ?>"
+                                                class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                                                alt="Material Variant" />
+                                        <?php else: ?>
+                                            <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- Info -->
+                                    <div class="mt-auto">
+
+                                        <h2 class="text-base font-semibold text-gray-800 break-words mb-1">
+                                            <?= htmlspecialchars($row['color']) ?> — <?= htmlspecialchars($row['size']) ?>
+                                        </h2>
+                                        <p class="text-sm text-green-600 mb-2">₱<?= number_format($row['price'], 2) ?></p>
+                                        <!-- Add to Cart Form -->
+                                        <form action="cart/add_to_cart.php" method="POST">
+                                            <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
+                                            <input type="hidden" name="selected_type" value="<?= $row['type_name'] ?>">
+                                            <input type="hidden" name="selected_variant" value="<?= $row['color'] ?>">
+
+                                            <button type="submit" class="mt-1 bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition">
+                                                Add to Cart
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
+                </div>
+            </section>
+
+
+
         </div>
     </section>
 
@@ -425,7 +603,7 @@ $discount_result = mysqli_query(
     </section>
 
 
-    <section class="p-3">
+    <section class="p-3 bg-gray-900">
         <div class="relative flex flex-col-reverse lg:flex-row items-center justify-between max-w-7xl mx-auto px-6 z-20">
             <!-- Left Side: Image -->
             <div class="w-full lg:w-1/2 flex justify-center mb-10 lg:mb-0">
@@ -471,14 +649,11 @@ $discount_result = mysqli_query(
                             </div>
                         </div>
                     </div>
-
-
-
                 </div>
             </div>
         </div>
-
     </section>
+
     <!-- About Section -->
     <section id="about" class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4">
@@ -549,7 +724,37 @@ $discount_result = mysqli_query(
         </div>
     </section>
 
-    <footer class="gradient-bg pattern-bg text-white py-16 mt-12 relative overflow-hidden">
+
+    <div id="chat-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+
+        <!-- ✅ CHAT TOGGLE BUTTON -->
+        <button id="chat-toggle" onclick="openChat()"
+            style="background-color: #16a34a; color: white; border: none; padding: 12px 18px; border-radius: 50px; box-shadow: 0 0 10px rgba(0,0,0,0.3); font-size: 14px; cursor: pointer;">
+            💬 Chat with us
+        </button>
+
+        <!-- ✅ CHATBOX IFRAME (Initially hidden) -->
+        <div id="chat-box" style="display: none; position: relative; margin-top: 10px;">
+            <!-- ❌ Close Button -->
+            <button onclick="closeChat()"
+                style="position: absolute; top: -10px; right: -10px; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 16px; cursor: pointer; z-index: 10000;">
+                ×
+            </button>
+
+            <!-- 🧩 IFRAME CHATBOX -->
+            <iframe
+                src="chatbot/login.php"
+                style="width: 360px; height: 540px; border: none; border-radius: 14px; box-shadow: 0 0 15px rgba(0,0,0,0.2);"
+                allow="clipboard-write">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Include Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+
+    <footer class="bg-gray-900 pattern-bg text-white py-16 mt-12 relative overflow-hidden">
         <!-- Decorative Elements -->
         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500"></div>
 
@@ -571,7 +776,7 @@ $discount_result = mysqli_query(
                         <!-- Text Branding -->
                         <div>
                             <h2 class="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Noble Home</h2>
-                            <p class="text-orange-300 font-medium">Building quality homes since 2010</p>
+
                         </div>
                     </div>
 
@@ -691,28 +896,37 @@ $discount_result = mysqli_query(
         </div>
     </footer>
 
-
-
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            new Swiper('.mySwiper-indoor', {
-                slidesPerView: 2,
-                spaceBetween: 15,
-                autoplay: {
-                    delay: 2500,
-                    disableOnInteraction: false,
+        function openChat() {
+            document.getElementById('chat-box').style.display = 'block';
+            document.getElementById('chat-toggle').style.display = 'none';
+        }
+
+        function closeChat() {
+            document.getElementById('chat-box').style.display = 'none';
+            document.getElementById('chat-toggle').style.display = 'inline-block';
+        }
+
+        const swiper = new Swiper(".mySwiper-indoor", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            loop: true,
+            autoplay: {
+                delay: 3000, // milliseconds per slide
+                disableOnInteraction: false // continue even after swipe
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2
                 },
-                loop: true,
-                breakpoints: {
-                    768: {
-                        slidesPerView: 3
-                    },
-                    1024: {
-                        slidesPerView: 4
-                    },
+                768: {
+                    slidesPerView: 3
                 },
-            });
+                1024: {
+                    slidesPerView: 5
+                }
+            }
         });
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -742,6 +956,37 @@ $discount_result = mysqli_query(
                 document.querySelector(this.getAttribute('href')).scrollIntoView({
                     behavior: 'smooth'
                 });
+            });
+        });
+
+
+        document.querySelectorAll('.filter-tab').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active style from all buttons
+                document.querySelectorAll('.filter-tab').forEach(btn => {
+                    btn.classList.remove('bg-orange-500', 'text-black');
+                    btn.classList.add('text-black');
+                });
+
+                // Add active style to the clicked button
+                this.classList.add('bg-orange-500', 'text-black');
+                this.classList.remove('text-black');
+
+                // Optional: do the filtering if needed (same as earlier)
+                const filter = this.getAttribute('data-filter');
+                document.querySelectorAll('.swiper-slide').forEach(slide => {
+                    const cat = slide.getAttribute('data-category');
+                    if (filter === 'all' || cat === filter) {
+                        slide.style.display = 'block';
+                    } else {
+                        slide.style.display = 'none';
+                    }
+                });
+
+                // Update Swiper (if needed)
+                if (typeof Swiper !== 'undefined' && document.querySelector('.mySwiper-indoor')?.swiper) {
+                    document.querySelector('.mySwiper-indoor').swiper.update();
+                }
             });
         });
     </script>
