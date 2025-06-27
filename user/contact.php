@@ -71,19 +71,19 @@
     </style>
 </head>
 
-<body class="bg-gray-900 min-h-screen">
+<body class="min-h-screen">
 
 <?php include 'navbar/top.php'; ?>
     <!-- Hero Section -->
-    <div class=" relative overflow-hidden">
-        <div class="absolute inset-0 bg-black opacity-10"></div>
+    <div class=" relative overflow-hidden bg-no-repeat bg-cover " style="background-image: url(img/bodyimg/g.jpg);">
+        <div class="absolute inset-0 bg-black opacity-50"></div>
         <div class="relative max-w-4xl mx-auto px-4 py-16 text-center">
             <div class="animate-float inline-block mb-6">
-                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl border border-orange-500 ">
                     <img src="img/logo/logo.png" alt="Noble Housing Logo" class="w-16 h-16 object-contain">
                 </div>
             </div>
-            <h1 class="text-5xl font-bold text-white mb-4">Get In Touch</h1>
+            <h1 class="text-5xl font-bold text-white mb-4">Contact us</h1>
             <p class="text-xl text-white opacity-90 max-w-2xl mx-auto">
                 We're here to help you find your perfect home. Reach out to us for any inquiries or assistance.
             </p>
@@ -349,7 +349,7 @@
 </section>
 
 
-       <footer class=" text-white py-16 mt-12 relative overflow-hidden">
+       <footer class=" text-white py-16 mt-12 relative overflow-hidden bg-gray-900">
         <!-- Decorative Elements -->
         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500"></div>
 
@@ -370,8 +370,8 @@
 
                         <!-- Text Branding -->
                         <div>
-                            <h2 class="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Noble Home</h2>
-                            <p class="text-orange-300 font-medium">Building quality homes since 2010</p>
+                            <h2 class="text-3xl text-orange-500 font-bold">Noble Home</h2>
+                            <p class="text-orange-300 font-medium">Construction</p>
                         </div>
                     </div>
 

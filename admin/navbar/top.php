@@ -29,16 +29,15 @@
           <div x-show="open" @click.away="open = false" x-transition x-cloak class="absolute left-0 mt-2 bg-white shadow-lg rounded-lg flex w-[500px] z-50">
             <!-- Main Categories -->
             <div class="w-1/2 border-r p-4 space-y-2">
-              <button @mouseenter="selected = 'materials'" class="block w-full text-left hover:text-orange-500">Construction Materials</button>
-              <button @mouseenter="selected = 'furniture'" class="block w-full text-left hover:text-orange-500">Furniture</button>
+              <button @mouseenter="selected = 'materials'" class="block w-full text-left hover:text-orange-500">Edit & Update Materials</button>
             </div>
 
             <!-- Subpanel -->
             <div class="w-1/2 p-4">
               <template x-if="selected === 'materials'">
                 <div>
-                  <a href="../manage/variant_select.php" class="block hover:text-orange-500">Upload Product</a>
-                  <a href="../manage/variant_selected.php" class="block hover:text-orange-500">Update Product</a>
+                  <a href="../shop/adminshop.php" class="block hover:text-orange-500">Upload Product</a>
+                  <a href="../shop/adminupdateshop.php" class="block hover:text-orange-500">Update Product</a>
                 </div>
               </template>
 

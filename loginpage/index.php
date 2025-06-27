@@ -107,7 +107,7 @@
     </style>
 </head>
 
-<body class="min-h-screen bg-white flex items-center justify-center p-4 relative">
+<body class="min-h-screen flex items-center justify-center p-4 relative ">
 
     <!-- Toast Notifications -->
     <div id="toast" class="toast hidden">
@@ -136,12 +136,12 @@
 
         <!-- Logo and Company Section -->
         <div class="text-center mb-8 fade-in-up">
-            <div class="inline-flex items-center justify-center w-[130px] h-[60px] rounded mb-4 logo-animation">
+            <div class="inline-flex items-center justify-center w-[130px] h-[60px] logo-animation bg-white rounded-full p-1" >
                 <img src="../user/img/logo/logo.png" alt="Logo" class="w-full h-full object-contain" />
             </div>
 
-            <h1 class="text-2xl font-semibold text-gray-900 mb-1">Admin Portal</h1>
-            <p class="text-gray-600">Secure access to your dashboard</p>
+            <h1 class="text-2xl font-semibold text-black mb-1">Admin panel</h1>
+            <p class="text-black">Secure access to your dashboard</p>
         </div>
 
         <!-- Login Card -->
@@ -217,11 +217,6 @@
                         <label for="remember" class="ml-2 block text-sm text-gray-700">
                             Remember me
                         </label>
-                    </div>
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
-                            Forgot password?
-                        </a>
                     </div>
                 </div>
 

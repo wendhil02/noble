@@ -112,7 +112,7 @@ include '../../connection/connect.php';
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+        <div class="grid grid-cols-1 xl:grid-cols-5 gap-3">
             <!-- Enhanced Form Container -->
             <div class="xl:col-span-2">
                 <div class="glass-effect card-shadow border border-white/20 overflow-hidden animate-slide-up">

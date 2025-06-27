@@ -39,7 +39,7 @@ $all_categories = ['furniture', 'material']; // Extend this as needed
 
 <?php include 'navbar/top.php'; ?>
 
-<div class="max-w-6xl mx-auto p-4">
+<div class=" p-4">
     <h1 class="text-3xl font-bold mb-6 text-orange-600">Shop Products</h1>
 
     <!-- Filter + Search Form -->
@@ -75,7 +75,7 @@ $all_categories = ['furniture', 'material']; // Extend this as needed
     </form>
 
     <!-- Product Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         <?php while ($row = $query->fetch_assoc()): ?>
             <?php
             $product_id = (int)$row['id'];
@@ -90,6 +90,13 @@ $all_categories = ['furniture', 'material']; // Extend this as needed
             ?>
 
             <a href="product_view.php?id=<?= $product_id ?>" class="bg-white rounded-xl shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 p-4 group">
+                  <!-- 🔽 Top-right Arrow Banner -->
+    <div class="absolute top-2 right-2 bg-orange-500 text-white rounded-full p-1 shadow-md">
+        <!-- Arrow Right Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+    </div>
                 <?php if (!empty($row['main_image'])): ?>
                     <div class="aspect-[4/5] bg-gray-50 rounded-lg overflow-hidden mb-3">
                         <img

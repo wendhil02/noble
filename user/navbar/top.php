@@ -139,20 +139,19 @@ foreach ($cart as $item) {
             <div class="w-1/2 p-4">
               <template x-if="selected === 'materials'">
                 <div>
-                  <a href="javascript:void(0)" onclick="navigateWithLoading('../manage/variant_select.php')"
-                    class="block hover:text-orange-500">Upload Product</a>
-                  <a href="javascript:void(0)" onclick="navigateWithLoading('../manage/variant_selected.php')"
-                    class="block hover:text-orange-500">Update Product</a>
+                  <a href="javascript:void(0)" onclick="navigateWithLoading('')"
+                    class="block hover:text-orange-500">temporary</a>
+                  <a href="javascript:void(0)" onclick="navigateWithLoading('')"
+                    class="block hover:text-orange-500">temporary</a>
                 </div>
               </template>
 
               <template x-if="selected === 'furniture'">
                 <div>
-                  <p class="font-bold mb-2">Ceiling Options</p>
-                  <a href="javascript:void(0)" onclick="navigateWithLoading('products/ceiling-flat.php')"
-                    class="block hover:text-orange-500">Flat Ceiling</a>
-                  <a href="javascript:void(0)" onclick="navigateWithLoading('products/ceiling-wood.php')"
-                    class="block hover:text-orange-500">Wood Pattern</a>
+                  <a href="javascript:void(0)" onclick="navigateWithLoading('')"
+                    class="block hover:text-orange-500">temporary</a>
+                  <a href="javascript:void(0)" onclick="navigateWithLoading('')"
+                    class="block hover:text-orange-500">temporary</a>
                 </div>
               </template>
             </div>

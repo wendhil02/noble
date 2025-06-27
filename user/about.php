@@ -62,10 +62,7 @@
                 </h2>
                 <div class="space-y-4">
                     <p class="text-gray-700 leading-relaxed">
-                        We envision a future where <span class="font-semibold text-blue-600">Noble Home Corp.</span> stands as the premier name in the construction product industry—recognized for exceptional quality, innovation, and customer trust.
-                    </p>
-                    <p class="text-gray-700 leading-relaxed">
-                        We aim to continuously exceed expectations by empowering our team, embracing innovation, and staying true to our values in all we do.
+                       To be the leading provider of premium furnishing supplies, offering customers a one-stop destination for style, quality, and affordability. We envision empowering every homeowner to create inspiring spaces that reflect their individual tastes and elevate their everyday living.
                     </p>
                 </div>
             </div>

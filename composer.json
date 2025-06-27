@@ -3,6 +3,8 @@
         "phpoffice/phpspreadsheet": "^4.2",
         "tecnickcom/tcpdf": "^6.9",
         "dompdf/dompdf": "^3.1",
-        "google/apiclient": "^2.18"
+        "google/apiclient": "^2.18",
+        "endroid/qr-code": "^4.0",
+        "phpmailer/phpmailer": "^6.10"
     }
 }

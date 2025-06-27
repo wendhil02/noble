@@ -25,8 +25,11 @@ $types = $conn->query("SELECT * FROM product_types WHERE product_id = $product_i
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 p-6">
-  <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow">
+<body class="bg-gray-100">
+
+<?php include '../navbar/top.php'; ?>
+
+  <div class=" bg-white p-6 rounded-lg shadow mt-5">
     <h2 class="text-2xl font-bold mb-4 text-orange-600">Update Product</h2>
 
     <form action="update_process.php" method="POST" enctype="multipart/form-data">
