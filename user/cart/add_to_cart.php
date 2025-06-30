@@ -40,18 +40,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $type_id = $type_data['id'];
 
-    // Get variant data
-    $variant_stmt = $conn->prepare("SELECT price, percent, discount, image FROM product_variants WHERE type_id = ? AND color = ?");
-    $variant_stmt->bind_param("is", $type_id, $selected_variant);
-    $variant_stmt->execute();
-    $variant_result = $variant_stmt->get_result();
-    $variant = $variant_result->fetch_assoc();
-    $variant_stmt->close();
+// Get variant data (updated to include namevariant)
+$variant_stmt = $conn->prepare("SELECT price, percent, discount, image, namevariant FROM product_variants WHERE type_id = ? AND color = ?");
+$variant_stmt->bind_param("is", $type_id, $selected_variant);
+$variant_stmt->execute();
+$variant_result = $variant_stmt->get_result();
+$variant = $variant_result->fetch_assoc();
+$variant_stmt->close();
 
-    if (!$variant) {
-        echo "<script>alert('Variant not found.'); window.history.back();</script>";
-        exit;
-    }
+if (!$variant) {
+    echo "<script>alert('Variant not found.'); window.history.back();</script>";
+    exit;
+}
+
 
     $variant_price = floatval($variant['price']);
     $percent = floatval($variant['percent']);
@@ -80,16 +81,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Add or update cart
     if (!isset($_SESSION['cart'][$cart_key])) {
         $_SESSION['cart'][$cart_key] = [
-            'product_id' => $product_id,
-            'name' => $product['product_name'],
-            'codename' => $product['codename'],
-            'type' => $selected_type,
-            'variant' => $selected_variant,
-            'price' => $final_price,
-            'quantity' => 1,
-            'image' => $base64_image,
-            'discount' => $discount
-        ];
+    'product_id' => $product_id,
+    'name' => $product['product_name'],
+    'codename' => $product['codename'],
+    'type' => $selected_type,
+    'variant' => $selected_variant,
+    'namevariant' => $variant['namevariant'] ?? '',
+    'price' => $final_price,
+    'quantity' => 1,
+    'image' => $base64_image,
+    'discount' => $discount
+];
+
     } else {
         $_SESSION['cart'][$cart_key]['quantity'] += 1;
     }

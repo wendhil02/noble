@@ -54,6 +54,25 @@
 import * as THREE from 'https://esm.sh/three@0.158.0';
 import { OrbitControls } from 'https://esm.sh/three@0.158.0/examples/jsm/controls/OrbitControls.js';
 
+const textures = {
+  right: "data:image/jpeg;base64,<?= base64_encode($block['side_right']) ?>",
+  left: "data:image/jpeg;base64,<?= base64_encode($block['side_left']) ?>",
+  top: "data:image/jpeg;base64,<?= base64_encode($block['side_top']) ?>",
+  bottom: "data:image/jpeg;base64,<?= base64_encode($block['side_bottom']) ?>",
+  front: "data:image/jpeg;base64,<?= base64_encode($block['side_front']) ?>",
+  back: "data:image/jpeg;base64,<?= base64_encode($block['side_back']) ?>"
+};
+
+const loader = new THREE.TextureLoader();
+const materials = [
+  new THREE.MeshStandardMaterial({ map: loader.load(textures.right) }),
+  new THREE.MeshStandardMaterial({ map: loader.load(textures.left) }),
+  new THREE.MeshStandardMaterial({ map: loader.load(textures.top) }),
+  new THREE.MeshStandardMaterial({ map: loader.load(textures.bottom) }),
+  new THREE.MeshStandardMaterial({ map: loader.load(textures.front) }),
+  new THREE.MeshStandardMaterial({ map: loader.load(textures.back) })
+];
+
 const canvas = document.getElementById('threeCanvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(canvas.clientWidth, canvas.clientHeight);

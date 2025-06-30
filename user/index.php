@@ -1,4 +1,5 @@
 <?php
+ob_start();
 include '../connection/connect.php'; // Adjust path if needed
 
 $query_variants1 = "SELECT id, type_id, color, size, price, percent, image FROM product_variants ORDER BY id DESC";
@@ -80,6 +81,11 @@ $filters = 'material'; // force it
 $query = "SELECT * FROM products WHERE codename = '$filters' ORDER BY id DESC";
 $results = mysqli_query($conn, $query);
 
+// handle filtering
+$filters = 'furnituretwo'; // force it
+$query = "SELECT * FROM products WHERE codename = '$filters' ORDER BY id DESC";
+$resultss = mysqli_query($conn, $query);
+
 
 $products = [];
 while ($row = mysqli_fetch_assoc($discount_result)) {
@@ -105,10 +111,12 @@ if (!empty($products)) {
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.tailwindcss.com?plugins=aspect-ratio"></script>
-    <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet" />
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
@@ -240,7 +248,7 @@ if (!empty($products)) {
         <div
             x-data="{
             images: [
-                'img/promo/1.png',
+                '',
                 'img/promo/2.png',
                 'img/marine/marine1/c.png'
             ],
@@ -339,7 +347,7 @@ if (!empty($products)) {
 
             <section class="py-8 bg-white">
                 <div class="max-w-7xl mx-auto px-4">
-                    <h2 class="text-2xl font-bold text-orange-600 mb-6 text-center">All Products</h2>
+                    <h2 class="text-2xl font-bold text-orange-600 mb-6 text-center" data-aos="fade-up" data-aos-delay="200">All Products</h2>
 
                     <?php if (empty($products)): ?>
                         <div class="text-center text-gray-500">
@@ -351,7 +359,7 @@ if (!empty($products)) {
                                 <?php if (!empty($column)): ?>
                                     <div class="h-[500px] overflow-hidden">
                                         <div class="swiper swiper-auto-<?= $i ?>">
-                                            <div class="swiper-wrapper">
+                                            <div class="swiper-wrapper" data-aos="fade-up" data-aos-delay="700">
                                                 <?php foreach ($column as $v): ?>
                                                     <div class="swiper-slide">
                                                         <div class="bg-white rounded-lg shadow text-center flex flex-col h-full p-3 justify-between">
@@ -388,18 +396,80 @@ if (!empty($products)) {
             </section>
 
 
+           <section class="px-4 py-10">
+  <!-- Header -->
+  <div class="text-center mb-10" data-aos="fade-up" data-aos-delay="200">
+    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight">Dining Chair and Table</h2>
+    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+  </div>
+
+  <!-- Swiper Slider -->
+  <div class="swiper mySwiper-indoor" data-aos="fade-up" data-aos-delay="300">
+    <div class="swiper-wrapper px-1 sm:px-2">
+      <?php while ($row = mysqli_fetch_assoc($resultss)) : ?>
+        <div class="swiper-slide p-2">
+          <a href="product_view.php?id=<?= (int)$row['id'] ?>"
+            class="flex flex-col justify-between h-[400px] bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 group text-center w-full relative">
+
+            <!-- Triangle Badge -->
+            <div class="absolute top-0 left-0 w-12 h-12 z-10">
+              <div class="w-12 h-12 bg-blue-400 clip-triangle relative">
+                <img src="img/icon/b.png" alt="Icon" class="absolute top-1.5 left-1.5 w-5 h-5 object-contain" />
+              </div>
+            </div>
+
+            <style>
+              .clip-triangle {
+                clip-path: polygon(0 0, 100% 0, 0 100%);
+              }
+            </style>
+
+            <!-- Product Image -->
+            <div class="aspect-square bg-gray-50 rounded-lg overflow-hidden mb-3">
+              <?php if (!empty($row['main_image'])): ?>
+                <img src="data:image/jpeg;base64,<?= base64_encode($row['main_image']) ?>"
+                  alt="<?= htmlspecialchars($row['product_name']) ?>"
+                  class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
+              <?php else: ?>
+                <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
+              <?php endif; ?>
+            </div>
+
+            <!-- Product Info -->
+            <div class="mt-auto space-y-1">
+              <h2 class="text-sm font-semibold text-gray-800 leading-snug break-words">
+                <?= htmlspecialchars($row['product_name']) ?>
+              </h2>
+
+              <?php if (!empty($row['description'])): ?>
+                <p class="text-xs text-gray-600 leading-tight line-clamp-2 h-10 overflow-hidden">
+                  <?= htmlspecialchars($row['description']) ?>
+                </p>
+              <?php else: ?>
+                <p class="text-xs text-gray-400 italic h-10">No description available.</p>
+              <?php endif; ?>
+            </div>
+          </a>
+        </div>
+      <?php endwhile; ?>
+    </div>
+  </div>
+</section>
+
+
+
             <section class="p-3">
-                <div class="mb-12 mt-10">
-                    <h2 class="text-4xl font-bold text-orange-500 mb-4">Furniture</h2>
-                    <h6 class="text-black text-md">Explore our range of furniture products.</h6>
-                    <div class="relative -bottom-2 left-0 w-15 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+                <div class="text-center mb-10">
+                    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight" data-aos="fade-up">Furniture</h2>
+
+                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full" data-aos="fade-up"></div>
                 </div>
 
                 <!-- Swiper Slider -->
                 <div class="swiper mySwiper-indoor">
                     <div class="swiper-wrapper p-2">
                         <?php while ($row = mysqli_fetch_assoc($result)) : ?>
-                            <div class="swiper-slide">
+                            <div class="swiper-slide" data-aos="fade-up">
                                 <a href="product_view.php?id=<?= (int)$row['id'] ?>"
                                     class="flex flex-col justify-between h-[380px] bg-white rounded-lg shadow-lg p-4 group text-center w-full relative">
 
@@ -452,17 +522,18 @@ if (!empty($products)) {
             </section>
 
             <section class="p-3">
-                <div class="mb-12 mt-10">
-                    <h2 class="text-4xl font-bold text-orange-500 mb-4">Materials</h2>
-                    <h6 class="text-black text-md">Explore our range of furniture products.</h6>
-                    <div class="relative -bottom-2 left-0 w-15 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+                <!-- Header -->
+                <div class="text-center mb-10">
+                    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight" data-aos="fade-up">Materials</h2>
+
+                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full" data-aos="fade-up"></div>
                 </div>
 
                 <!-- Swiper Slider -->
                 <div class="swiper mySwiper-indoor">
                     <div class="swiper-wrapper p-2">
                         <?php while ($row = mysqli_fetch_assoc($results)) : ?>
-                            <div class="swiper-slide h-full">
+                            <div class="swiper-slide h-full" data-aos="fade-up" data-aos-delay="400">
                                 <a href="product_view.php?id=<?= (int)$row['id'] ?>"
                                     class="flex flex-col justify-between h-[430px] bg-white rounded-lg shadow-lg p-4 group text-center w-full relative">
 
@@ -517,8 +588,8 @@ if (!empty($products)) {
             <section class="px-4 py-10">
                 <!-- Header -->
                 <div class="text-center mb-10">
-                    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight">Top Sales</h2>
-                    <h2 class="text-2xl font-extrabold text-orange-500 mb-2 tracking-tight">
+                    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight" data-aos="fade-up">Top Sales</h2>
+                    <h2 class="text-2xl font-extrabold text-orange-500 mb-2 tracking-tight" data-aos="fade-up">
                         Get Up to <span class="text-red-500">40% Discount</span> on Select Items!
                     </h2>
 
@@ -527,7 +598,7 @@ if (!empty($products)) {
 
                 <!-- Swiper Container -->
                 <div class="swiper mySwiper-material">
-                    <div class="swiper-wrapper">
+                    <div class="swiper-wrapper" data-aos="fade-up" data-aos-delay="300">
                         <?php while ($row = mysqli_fetch_assoc($material_results)) : ?>
                             <?php
                             $base = (float)$row['price'];
@@ -579,21 +650,36 @@ if (!empty($products)) {
                                             <p class="text-base text-green-600 font-bold mb-2">₱<?= number_format($priceWithMarkup, 2) ?></p>
                                         <?php endif; ?>
 
-                                        <!-- Add to Cart -->
-                                        <form action="cart/add_to_cart.php" method="POST" class="mt-2">
-                                            <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
-                                            <input type="hidden" name="selected_type" value="<?= $row['type_name'] ?>">
-                                            <input type="hidden" name="selected_variant" value="<?= $row['color'] ?>">
 
-                                            <button
-                                                type="submit"
-                                                class="bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition flex items-center gap-2 mx-auto">
-                                                <!-- Cart Icon as Image -->
-                                                <img src="img/icon/ecommerce.png" alt="Cart" class="w-4 h-4" />
-                                                Add to Cart
-                                            </button>
+                                        <div class="flex justify-center gap-2 mt-2">
+                                            <!-- Shop Button -->
+                                            <form action="product_view.php" method="GET">
+                                                <input type="hidden" name="id" value="<?= (int)$row['product_id'] ?>">
+                                                <button
+                                                    type="submit"
+                                                    class="bg-green-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-green-600 transition flex items-center gap-2 shadow-sm hover:shadow-md group">
+                                                    <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                    Shop
+                                                </button>
+                                            </form>
 
-                                        </form>
+                                            <!-- Add to Cart Button -->
+                                            <form action="cart/add_to_cart.php" method="POST">
+                                                <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
+                                                <input type="hidden" name="selected_type" value="<?= $row['type_name'] ?>">
+                                                <input type="hidden" name="selected_variant" value="<?= $row['color'] ?>">
+                                                <button
+                                                    type="submit"
+                                                    class="bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition flex items-center gap-2 shadow-sm hover:shadow-md">
+                                                    <img src="img/icon/ecommerce.png" alt="Cart" class="w-4 h-4" />
+                                                    Add to Cart
+                                                </button>
+                                            </form>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -605,13 +691,13 @@ if (!empty($products)) {
             <section class="px-4 py-10">
                 <!-- Header -->
                 <div class="text-center mb-10">
-                    <h2 class="text-2xl font-extrabold text-orange-500 mb-2 tracking-tight">Discount Minimal <span class="text-red-500">up to 30%</span></h2>
-                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+                    <h2 class="text-2xl font-extrabold text-orange-500 mb-2 tracking-tight" data-aos="fade-up">Discount Minimal <span class="text-red-500">up to 30%</span></h2>
+                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full" data-aos="fade-up"></div>
                 </div>
 
                 <!-- Swiper Container -->
                 <div class="swiper mySwiper-material">
-                    <div class="swiper-wrapper">
+                    <div class="swiper-wrapper" data-aos="fade-up" data-aos-delay="300">
                         <?php while ($row = mysqli_fetch_assoc($material_resultsone)) : ?>
                             <?php
                             $base = (float)$row['price'];
@@ -690,13 +776,13 @@ if (!empty($products)) {
             <section class="p-5">
                 <!-- Header -->
                 <div class="mb-10 mt-10 text-center">
-                    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight">New Arrival</h2>
-                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+                    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight" data-aos="slide-up">New Arrival</h2>
+                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"  data-aos="fade-up"></div>
                 </div>
 
                 <!-- Swiper Container -->
                 <div class="swiper mySwiper-material">
-                    <div class="swiper-wrapper">
+                    <div class="swiper-wrapper" data-aos="fade-up" data-aos-delay="700">
                         <?php
                         $has_new = false;
                         while ($row = mysqli_fetch_assoc($material_resultstwo)) :
@@ -790,66 +876,6 @@ if (!empty($products)) {
 
         </div>
     </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-16 bg-white mt-10">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center lg:flex-row-reverse">
-
-                <!-- Panorama Embed (e.g., Kuula or Google Maps 360) -->
-                <div>
-                    <iframe
-                        src="https://kd20-realiving.yfcad.com/pano?id=61549778"
-                        width="100%"
-                        height="400"
-                        class="rounded-lg shadow-md"
-                        allowfullscreen
-                        loading="lazy"
-                        style="border:0;">
-                    </iframe>
-                </div>
-
-
-                <div>
-                    <iframe
-                        src="https://kd20-realiving.yfcad.com/pano?id=61549751"
-                        width="100%"
-                        height="400"
-                        class="rounded-lg shadow-md"
-                        allowfullscreen
-                        loading="lazy"
-                        style="border:0;">
-                    </iframe>
-                </div>
-
-                <div>
-                    <iframe
-                        src="https://kd20-realiving.yfcad.com/pano?id=61716588"
-                        width="100%"
-                        height="400"
-                        class="rounded-lg shadow-md"
-                        allowfullscreen
-                        loading="lazy"
-                        style="border:0;">
-                    </iframe>
-                </div>
-
-                <div>
-                    <iframe
-                        src="https://kd20-realiving.yfcad.com/pano?id=56582469"
-                        width="100%"
-                        height="400"
-                        class="rounded-lg shadow-md"
-                        allowfullscreen
-                        loading="lazy"
-                        style="border:0;">
-                    </iframe>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
 
     <!-- Contact Section -->
     <section id="contact" class="py-16 bg-gray-100">
@@ -1066,7 +1092,7 @@ if (!empty($products)) {
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
     <!-- Init AOS -->
     <script>
         AOS.init();

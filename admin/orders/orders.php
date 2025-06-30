@@ -82,7 +82,7 @@ if ($client_check->num_rows == 0) {
           </ul>
           <p style='margin-top:20px;'>
             <a href='http://localhost/noble/admin/orders/billing.php?order_id=$orderId' target='_blank'
-              style='background:#10b981;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;'>📤 Upload Proof of Payment</a>
+              style='background:#10b981;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;'>Billing</a>
           </p>
           <p>Thank you for shopping with <strong style='color:#ea580c;'>NobleHome</strong>! 🏠</p>
         </div>";

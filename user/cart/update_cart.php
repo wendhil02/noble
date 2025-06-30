@@ -9,5 +9,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-header('Location: cart_view.php');
+header('Location: ../cart_view.php');
 exit;

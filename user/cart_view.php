@@ -1,5 +1,4 @@
 <?php
-session_start();
 $cart = $_SESSION['cart'] ?? [];
 $total_price = 0;
 ?>
@@ -13,25 +12,27 @@ $total_price = 0;
 </head>
 <body class="bg-gray-100 font-sans">
 
-<div class="max-w-7xl mx-auto px-4 py-4">
+<?php include 'navbar/top.php'; ?>
+
+<div class=" px-4 py-4">
   <nav class="text-sm text-gray-600">
-    <a href="../index" class="hover:text-orange-600">Home</a>
+    <a href="index" class="hover:text-orange-600">Home</a>
     <span class="mx-2">/</span>
-    <a href="../shop.php" class="hover:text-orange-600">Shop</a>
+    <a href="shop" class="hover:text-orange-600">Shop</a>
     <span class="mx-2">/</span>
     <span class="text-orange-600 font-medium">Cart</span>
   </nav>
 </div>
 
-<div class="max-w-7xl mx-auto px-4 py-6">
+<div class=" px-4 py-2">
   <div class="bg-white shadow-lg rounded-lg p-6">
     <h2 class="text-3xl font-bold text-orange-700 mb-6 flex items-center gap-2">🛒 Your Cart</h2>
 
     <?php if (empty($cart)): ?>
       <p class="text-gray-600 text-lg">Your cart is currently empty.</p>
-      <a href="../shop.php" class="inline-block mt-4 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition">Continue Shopping</a>
+      <a href="shop" class="inline-block mt-4 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition">Continue Shopping</a>
     <?php else: ?>
-      <form action="update_cart.php" method="POST">
+      <form action="cart/update_cart" method="POST">
         <div class="overflow-x-auto">
           <table class="w-full text-sm text-left border-collapse">
             <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
@@ -39,8 +40,8 @@ $total_price = 0;
                 <th class="py-3 px-4">Image</th>
                 <th class="py-3 px-4">Product</th>
                 <th class="py-3 px-4">Codename</th>
-                <th class="py-3 px-4">Type</th>
-                <th class="py-3 px-4">Color</th>
+                <th class="py-3 px-4">Variant</th>
+                <th class="py-3 px-4">Namevariant</th> <!-- ✅ Added -->
                 <th class="py-3 px-4">Qty</th>
                 <th class="py-3 px-4">Unit Price</th>
                 <th class="py-3 px-4">Subtotal</th>
@@ -61,15 +62,15 @@ $total_price = 0;
                   </td>
                   <td class="py-3 px-4 font-semibold text-gray-800"><?= htmlspecialchars($item['name']) ?></td>
                   <td class="py-3 px-4 text-gray-600"><?= htmlspecialchars($item['codename']) ?></td>
-                  <td class="py-3 px-4 text-gray-600"><?= htmlspecialchars($item['type']) ?></td>
                   <td class="py-3 px-4 text-gray-600"><?= htmlspecialchars($item['variant']) ?></td>
+                  <td class="py-3 px-4 text-gray-600"><?= htmlspecialchars($item['namevariant'] ?? '—') ?></td> 
                   <td class="py-3 px-4">
                     <input type="number" name="quantities[<?= $key ?>]" value="<?= $item['quantity'] ?>" min="1" class="w-16 border-gray-300 border rounded px-2 py-1 text-center shadow-sm">
                   </td>
                   <td class="py-3 px-4 text-orange-600 font-medium">₱<?= number_format($priceWithMarkup, 2) ?></td>
                   <td class="py-3 px-4 text-green-600 font-bold">₱<?= number_format($subtotal, 2) ?></td>
                   <td class="py-3 px-4">
-                    <a href="remove_from_cart.php?key=<?= urlencode($key) ?>" class="text-red-500 hover:text-red-700 hover:underline">Remove</a>
+                    <a href="cart/remove_from_cart.php?key=<?= urlencode($key) ?>" class="text-red-500 hover:text-red-700 hover:underline">Remove</a>
                   </td>
                 </tr>
               <?php endforeach; ?>

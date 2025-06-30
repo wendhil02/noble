@@ -1,5 +1,6 @@
-<?php
+<?php 
 session_start();
+
 $cart = $_SESSION['cart'] ?? [];
 $total_cart_items = 0;
 
@@ -103,7 +104,7 @@ foreach ($cart as $item) {
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex justify-between items-center py-4">
       <!-- Logo -->
-      <a href="javascript:void(0)" onclick="navigateWithLoading('index.php')"
+      <a href="javascript:void(0)" onclick="navigateWithLoading('index')"
         class="flex items-center space-x-3 hover:opacity-80 transition">
         <div class="w-10 h-10 rounded overflow-hidden">
           <img src="img/logo/logo.png" alt="Noble Home Logo" class="w-full h-full object-cover">
@@ -176,7 +177,7 @@ foreach ($cart as $item) {
           Shop
         </a>
 
-        <a href="javascript:void(0)" onclick="navigateWithLoading('cart/cart_view')"
+        <a href="javascript:void(0)" onclick="navigateWithLoading('cart_view')"
           class="<?= $current_page == 'cart/cart_view' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition inline-flex items-center gap-1 relative">
 
           <!-- Cart Icon -->

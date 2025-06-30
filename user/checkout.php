@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../../connection/connect.php';
+include '../connection/connect.php';
 
 $cart = $_SESSION['cart'] ?? [];
 $total_price = array_sum(array_map(fn($item) => $item['price'] * $item['quantity'], $cart));
