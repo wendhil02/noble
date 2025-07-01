@@ -326,10 +326,18 @@ include '../../connection/connect.php';
 
                     <div class="p-6">
                         <?php
-                        // Fetch all client data
-                        $sql = "SELECT * FROM client_info ORDER BY created_at DESC";
-                        $result = $conn->query($sql);
+ $sql = "
+        SELECT *
+        FROM client_info ci
+        WHERE ci.id IN (
+            SELECT MAX(id)
+            FROM client_info
+            GROUP BY email
+        )
+        ORDER BY ci.created_at DESC
+    ";
 
+    $result = $conn->query($sql);
                         if ($result && $result->num_rows > 0) {
                         ?>
 

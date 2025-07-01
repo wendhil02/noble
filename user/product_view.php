@@ -297,38 +297,76 @@ foreach ($types as $type) {
 
           <!-- Purchase Section -->
           <div class="border-t pt-8">
-            <form action="cart/add_to_cart.php" method="POST" class="space-y-6">
-              <input type="hidden" name="product_id" value="<?= $product_id ?>">
-              <input type="hidden" name="selected_type" id="selected_type">
-              <input type="hidden" name="selected_variant" id="selected_variant">
-              <input type="hidden" name="return_url" value="product_view.php?id=<?= $product['id'] ?>">
+            <form id="addToCartForm" class="space-y-6">
+  <input type="hidden" name="product_id" value="<?= $product_id ?>">
+  <input type="hidden" name="selected_type" id="selected_type">
+  <input type="hidden" name="selected_variant" id="selected_variant">
+  <input type="hidden" name="return_url" value="product_view.php?id=<?= $product['id'] ?>">
 
-              <!-- Price Display -->
-              <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-sm text-gray-600 mb-1">Total Price</p>
-                    <p id="totalPrice" class="text-3xl font-bold text-green-600">₱0.00</p>
-                  </div>
-                </div>
-              </div>
+  <!-- Price Display -->
+  <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-600 mb-1">Total Price</p>
+        <p id="totalPrice" class="text-3xl font-bold text-green-600">₱0.00</p>
+      </div>
+    </div>
+  </div>
 
-              <!-- Add to Cart Button -->
-              <button
-                type="submit"
-                class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-3 group">
-                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6"></path>
-                </svg>
-                Proceed
-              </button>
-            </form>
+  <!-- Add to Cart Button -->
+  <button
+    type="submit"
+    class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-3 group">
+    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6"></path>
+    </svg>
+    Proceed
+  </button>
+
+  <!-- Optional: feedback -->
+  <p id="cartMessage" class="text-green-600 font-semibold hidden"></p>
+</form>
+
           </div>
         </div>
       </div>
     </div>
 
     <script>
+
+document.getElementById('addToCartForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const formData = new FormData(form);
+
+  fetch('cart/add_to_cart.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // ✅ Show message
+      const msg = document.getElementById('cartMessage');
+      msg.textContent = data.message;
+      msg.classList.remove('hidden');
+      msg.classList.add('block');
+
+      // ✅ Update cart count badge
+      const badge = document.getElementById('cartCountBadge');
+      badge.textContent = data.cart_count;
+      badge.classList.remove('hidden');
+    } else {
+      console.error(data.error || 'Add to cart failed');
+    }
+  })
+  .catch(error => {
+    console.error('Error adding to cart:', error);
+  });
+});
+
+
       document.addEventListener("DOMContentLoaded", () => {
         const variantGroups = document.querySelectorAll(".variant-group");
 
