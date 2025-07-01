@@ -95,7 +95,7 @@ foreach ($_POST['type_id'] as $i => $type_id) {
             $namevariant = $_POST['variant_namevariant'][$i][$j] ?? '';
             $variant_image = null;
 
-            // ✅ FIXED: Correct file input handling for variant images
+            //  FIXED: Correct file input handling for variant images
             if (isset($_FILES['variant_image']['tmp_name'][$i][$j]) && 
                 !empty($_FILES['variant_image']['tmp_name'][$i][$j]) &&
                 $_FILES['variant_image']['error'][$i][$j] === UPLOAD_ERR_OK) {
@@ -127,6 +127,7 @@ foreach ($_POST['type_id'] as $i => $type_id) {
         }
     }
 }
+
 
 echo "<script>alert('Product updated successfully!'); window.location.href = 'adminshop.php';</script>";
 ?>

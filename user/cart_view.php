@@ -70,7 +70,18 @@ $total_price = 0;
                   <td class="py-3 px-4 text-orange-600 font-medium">₱<?= number_format($priceWithMarkup, 2) ?></td>
                   <td class="py-3 px-4 text-green-600 font-bold">₱<?= number_format($subtotal, 2) ?></td>
                   <td class="py-3 px-4">
-                    <a href="cart/remove_from_cart.php?key=<?= urlencode($key) ?>" class="text-red-500 hover:text-red-700 hover:underline">Remove</a>
+                    <a href="cart/remove_from_cart.php?key=<?= urlencode($key) ?>"
+   class="text-red-500 hover:text-red-700 transition duration-200"
+   title="Remove Item">
+  <!-- Trash icon -->
+  <svg xmlns="http://www.w3.org/2000/svg"
+       class="w-5 h-5 hover:scale-110 transition-transform"
+       fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"/>
+  </svg>
+</a>
+
                   </td>
                 </tr>
               <?php endforeach; ?>

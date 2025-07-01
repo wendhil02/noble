@@ -1,7 +1,6 @@
 <?php
 session_start();
 include '../../connection/connect.php';
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -258,7 +257,7 @@ include '../../connection/connect.php';
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5.121 17.804A7 7 0 0112 5a7 7 0 016.879 12.804M15 11h.01M9 11h.01M8 15h8" />
                                     </svg>
-                                    Sex 
+                                    Sex
                                 </span>
                             </label>
                             <select id="sex" name="sex" required
@@ -321,7 +320,7 @@ include '../../connection/connect.php';
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                             </svg>
-                            Client Database
+                            Client
                         </h2>
                     </div>
 
@@ -420,11 +419,9 @@ include '../../connection/connect.php';
                                     </tbody>
                                 </table>
                             </div>
-
                         <?php
                         } else {
                         ?>
-
                             <div class="text-center py-16">
                                 <div class="bg-gray-100 rounded-full p-6 mx-auto w-24 h-24 flex items-center justify-center mb-6">
                                     <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -437,7 +434,6 @@ include '../../connection/connect.php';
                                     <p class="text-blue-700 text-sm">👈 Use the form on the left to add a new client</p>
                                 </div>
                             </div>
-
                         <?php
                         }
                         // Close connection

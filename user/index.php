@@ -243,14 +243,28 @@ if (!empty($products)) {
 
     <?php include 'navbar/top.php'; ?>
 
+    <?php if (isset($_SESSION['toast'])): ?>
+        <div id="toast" class="fixed top-5 right-5 bg-<?= $_SESSION['toast']['type'] === 'error' ? 'red' : 'green' ?>-500 text-white text-sm px-4 py-2 rounded shadow-lg z-50">
+            <?= htmlspecialchars($_SESSION['toast']['message']) ?>
+        </div>
+        <script>
+            setTimeout(() => {
+                const toast = document.getElementById('toast');
+                if (toast) toast.style.display = 'none';
+            }, 4000);
+        </script>
+        <?php unset($_SESSION['toast']); ?>
+    <?php endif; ?>
+
+
 
     <section class="w-full overflow-hidden bg-gray-100">
         <div
             x-data="{
             images: [
-                '',
-                'img/promo/2.png',
-                'img/marine/marine1/c.png'
+                'img/promo/3.png',
+                'img/promo/4.png',
+                'img/promo/'             
             ],
             current: 0,
             next() {
@@ -396,65 +410,65 @@ if (!empty($products)) {
             </section>
 
 
-           <section class="px-4 py-10">
-  <!-- Header -->
-  <div class="text-center mb-10" data-aos="fade-up" data-aos-delay="200">
-    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight">Dining Chair and Table</h2>
-    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
-  </div>
+            <section class="px-4 py-10">
+                <!-- Header -->
+                <div class="text-center mb-10" data-aos="fade-up" data-aos-delay="200">
+                    <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight">Bed Room</h2>
+                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"></div>
+                </div>
 
-  <!-- Swiper Slider -->
-  <div class="swiper mySwiper-indoor" data-aos="fade-up" data-aos-delay="300">
-    <div class="swiper-wrapper px-1 sm:px-2">
-      <?php while ($row = mysqli_fetch_assoc($resultss)) : ?>
-        <div class="swiper-slide p-2">
-          <a href="product_view.php?id=<?= (int)$row['id'] ?>"
-            class="flex flex-col justify-between h-[400px] bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 group text-center w-full relative">
+                <!-- Swiper Slider -->
+                <div class="swiper mySwiper-indoor" data-aos="fade-up" data-aos-delay="300">
+                    <div class="swiper-wrapper px-1 sm:px-2">
+                        <?php while ($row = mysqli_fetch_assoc($resultss)) : ?>
+                            <div class="swiper-slide p-2">
+                                <a href="product_view.php?id=<?= (int)$row['id'] ?>"
+                                    class="flex flex-col justify-between h-[400px] bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-4 group text-center w-full relative">
 
-            <!-- Triangle Badge -->
-            <div class="absolute top-0 left-0 w-12 h-12 z-10">
-              <div class="w-12 h-12 bg-blue-400 clip-triangle relative">
-                <img src="img/icon/b.png" alt="Icon" class="absolute top-1.5 left-1.5 w-5 h-5 object-contain" />
-              </div>
-            </div>
+                                    <!-- Triangle Badge -->
+                                    <div class="absolute top-0 left-0 w-12 h-12 z-10">
+                                        <div class="w-12 h-12 bg-blue-400 clip-triangle relative">
+                                            <img src="img/icon/b.png" alt="Icon" class="absolute top-1.5 left-1.5 w-5 h-5 object-contain" />
+                                        </div>
+                                    </div>
 
-            <style>
-              .clip-triangle {
-                clip-path: polygon(0 0, 100% 0, 0 100%);
-              }
-            </style>
+                                    <style>
+                                        .clip-triangle {
+                                            clip-path: polygon(0 0, 100% 0, 0 100%);
+                                        }
+                                    </style>
 
-            <!-- Product Image -->
-            <div class="aspect-square bg-gray-50 rounded-lg overflow-hidden mb-3">
-              <?php if (!empty($row['main_image'])): ?>
-                <img src="data:image/jpeg;base64,<?= base64_encode($row['main_image']) ?>"
-                  alt="<?= htmlspecialchars($row['product_name']) ?>"
-                  class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
-              <?php else: ?>
-                <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
-              <?php endif; ?>
-            </div>
+                                    <!-- Product Image -->
+                                    <div class="aspect-square bg-gray-50 rounded-lg overflow-hidden mb-3">
+                                        <?php if (!empty($row['main_image'])): ?>
+                                            <img src="data:image/jpeg;base64,<?= base64_encode($row['main_image']) ?>"
+                                                alt="<?= htmlspecialchars($row['product_name']) ?>"
+                                                class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
+                                        <?php else: ?>
+                                            <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
+                                        <?php endif; ?>
+                                    </div>
 
-            <!-- Product Info -->
-            <div class="mt-auto space-y-1">
-              <h2 class="text-sm font-semibold text-gray-800 leading-snug break-words">
-                <?= htmlspecialchars($row['product_name']) ?>
-              </h2>
+                                    <!-- Product Info -->
+                                    <div class="mt-auto space-y-1">
+                                        <h2 class="text-sm font-semibold text-gray-800 leading-snug break-words underline mb-1">
+                                            <?= htmlspecialchars($row['product_name']) ?>
+                                        </h2>
 
-              <?php if (!empty($row['description'])): ?>
-                <p class="text-xs text-gray-600 leading-tight line-clamp-2 h-10 overflow-hidden">
-                  <?= htmlspecialchars($row['description']) ?>
-                </p>
-              <?php else: ?>
-                <p class="text-xs text-gray-400 italic h-10">No description available.</p>
-              <?php endif; ?>
-            </div>
-          </a>
-        </div>
-      <?php endwhile; ?>
-    </div>
-  </div>
-</section>
+                                        <?php if (!empty($row['description'])): ?>
+                                            <p class="text-xs text-gray-600 leading-tight line-clamp-2 h-10 overflow-hidden">
+                                                <?= htmlspecialchars($row['description']) ?>
+                                            </p>
+                                        <?php else: ?>
+                                            <p class="text-xs text-gray-400 italic h-10">No description available.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </a>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
+                </div>
+            </section>
 
 
 
@@ -657,23 +671,26 @@ if (!empty($products)) {
                                                 <input type="hidden" name="id" value="<?= (int)$row['product_id'] ?>">
                                                 <button
                                                     type="submit"
-                                                    class="bg-green-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-green-600 transition flex items-center gap-2 shadow-sm hover:shadow-md group">
+                                                    class="relative bg-red-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-red-900 transition flex items-center gap-2 shadow-sm hover:shadow-md group
+                                                         border-2 border-white ring-2 ring-red-200">
+                                                    <!-- 🛍️ Shopping Bag Icon -->
                                                     <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 11h14l-1.5 9h-11L5 11z" />
                                                     </svg>
                                                     Shop
                                                 </button>
                                             </form>
 
-                                            <!-- Add to Cart Button -->
-                                            <form action="cart/add_to_cart.php" method="POST">
+
+                                            <form class="add-to-cart-form">
                                                 <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
                                                 <input type="hidden" name="selected_type" value="<?= $row['type_name'] ?>">
                                                 <input type="hidden" name="selected_variant" value="<?= $row['color'] ?>">
+                                                <input type="hidden" name="return_url" value="index.php">
                                                 <button
                                                     type="submit"
-                                                    class="bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition flex items-center gap-2 shadow-sm hover:shadow-md">
+                                                    class="bg-orange-500 text-white text-sm px-2 py-1.5 rounded-full hover:bg-orange-600 transition flex items-center gap-2 shadow-sm hover:shadow-md">
                                                     <img src="img/icon/ecommerce.png" alt="Cart" class="w-4 h-4" />
                                                     Add to Cart
                                                 </button>
@@ -750,21 +767,39 @@ if (!empty($products)) {
                                             <p class="text-base text-green-600 font-bold mb-2">₱<?= number_format($priceWithMarkup, 2) ?></p>
                                         <?php endif; ?>
 
-                                        <!-- Add to Cart -->
-                                        <form action="cart/add_to_cart.php" method="POST" class="mt-2">
-                                            <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
-                                            <input type="hidden" name="selected_type" value="<?= $row['type_name'] ?>">
-                                            <input type="hidden" name="selected_variant" value="<?= $row['color'] ?>">
 
-                                            <button
-                                                type="submit"
-                                                class="bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition flex items-center gap-2 mx-auto">
-                                                <!-- Cart Icon as Image -->
-                                                <img src="img/icon/ecommerce.png" alt="Cart" class="w-4 h-4" />
-                                                Add to Cart
-                                            </button>
+                                        <div class="flex justify-center gap-2 mt-2">
+                                            <!-- Shop Button -->
+                                            <form action="product_view.php" method="GET">
+                                                <input type="hidden" name="id" value="<?= (int)$row['product_id'] ?>">
+                                                <button
+                                                    type="submit"
+                                                    class="relative bg-red-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-red-900 transition flex items-center gap-2 shadow-sm hover:shadow-md group
+                  border-2 border-white ring-2 ring-red-200">
+                                                    <!-- 🛍️ Shopping Bag Icon -->
+                                                    <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 11h14l-1.5 9h-11L5 11z" />
+                                                    </svg>
+                                                    Shop
+                                                </button>
+                                            </form>
 
-                                        </form>
+                                            <form class="add-to-cart-form">
+                                                <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
+                                                <input type="hidden" name="selected_type" value="<?= $row['type_name'] ?>">
+                                                <input type="hidden" name="selected_variant" value="<?= $row['color'] ?>">
+                                                <input type="hidden" name="return_url" value="index.php">
+                                                <button
+                                                    type="submit"
+                                                    class="bg-orange-500 text-white text-sm px-2 py-1.5 rounded-full hover:bg-orange-600 transition flex items-center gap-2 shadow-sm hover:shadow-md">
+                                                    <img src="img/icon/ecommerce.png" alt="Cart" class="w-4 h-4" />
+                                                    Add to Cart
+                                                </button>
+                                            </form>
+
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -777,12 +812,12 @@ if (!empty($products)) {
                 <!-- Header -->
                 <div class="mb-10 mt-10 text-center">
                     <h2 class="text-4xl font-extrabold text-orange-500 mb-2 tracking-tight" data-aos="slide-up">New Arrival</h2>
-                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full"  data-aos="fade-up"></div>
+                    <div class="mx-auto w-32 h-1 bg-gradient-to-r from-orange-500 to-transparent rounded-full" data-aos="fade-up"></div>
                 </div>
 
                 <!-- Swiper Container -->
                 <div class="swiper mySwiper-material">
-                    <div class="swiper-wrapper" data-aos="fade-up" data-aos-delay="700">
+                    <div class="swiper-wrapper" data-aos="fade-up" data-aos-delay="200">
                         <?php
                         $has_new = false;
                         while ($row = mysqli_fetch_assoc($material_resultstwo)) :
@@ -843,19 +878,38 @@ if (!empty($products)) {
                                             </ul>
                                             <p class="text-sm text-green-600 mb-2">₱<?= number_format($row['price'], 2) ?></p>
 
-                                            <!-- Add to Cart Form -->
-                                            <form action="cart/add_to_cart.php" method="POST">
-                                                <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
-                                                <input type="hidden" name="selected_type" value="<?= $row['type_name'] ?>">
-                                                <input type="hidden" name="selected_variant" value="<?= $row['color'] ?>">
-                                                <button
-                                                    type="submit"
-                                                    class="bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition flex items-center gap-2 mx-auto">
-                                                    <!-- Cart Icon as Image -->
-                                                    <img src="img/icon/ecommerce.png" alt="Cart" class="w-4 h-4" />
-                                                    Add to Cart
-                                                </button>
-                                            </form>
+
+                                            <div class="flex justify-center gap-2 mt-2">
+                                                <!-- Shop Button -->
+                                                <form action="product_view.php" method="GET">
+                                                    <input type="hidden" name="id" value="<?= (int)$row['product_id'] ?>">
+                                                    <button
+                                                        type="submit"
+                                                        class="relative bg-red-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-red-900 transition flex items-center gap-2 shadow-sm hover:shadow-md group
+                                                         border-2 border-white ring-2 ring-red-200">
+                                                        <!-- 🛍️ Shopping Bag Icon -->
+                                                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 11h14l-1.5 9h-11L5 11z" />
+                                                        </svg>
+                                                        Shop
+                                                    </button>
+                                                </form>
+
+
+                                                <form class="add-to-cart-form">
+                                                    <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
+                                                    <input type="hidden" name="selected_type" value="<?= $row['type_name'] ?>">
+                                                    <input type="hidden" name="selected_variant" value="<?= $row['color'] ?>">
+                                                    <input type="hidden" name="return_url" value="index.php">
+                                                    <button
+                                                        type="submit"
+                                                        class="bg-orange-500 text-white text-sm px-2 py-1.5 rounded-full hover:bg-orange-600 transition flex items-center gap-2 shadow-sm hover:shadow-md">
+                                                        <img src="img/icon/ecommerce.png" alt="Cart" class="w-4 h-4" />
+                                                        Add to Cart
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1098,6 +1152,92 @@ if (!empty($products)) {
         AOS.init();
     </script>
     <script>
+        // ✅ Updated Add to Cart functionality with dynamic cart count update
+        document.querySelectorAll('.add-to-cart-form').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault(); // Stop page reload
+
+                const formData = new FormData(this);
+
+                try {
+                    const response = await fetch('cart/add_to_cart.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json(); // Expect JSON response
+
+                    if (response.ok && result.success) {
+                        // ✅ Show success toast
+                        showToast("Added to cart successfully!", "success");
+
+                        // ✅ Update cart count dynamically
+                        updateCartCount(result.cart_count);
+
+                    } else {
+                        showToast(result.message || "Failed to add to cart.", "error");
+                    }
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast("Network error. Please try again.", "error");
+                }
+            });
+        });
+
+        // ✅ Function to update cart count in navigation
+        function updateCartCount(newCount) {
+            const cartLink = document.querySelector('a[onclick*="cart_view"]');
+            if (!cartLink) return;
+
+            // Find existing notification bubble
+            let notificationBubble = cartLink.querySelector('.bg-red-500');
+
+            if (newCount > 0) {
+                if (notificationBubble) {
+                    // Update existing bubble
+                    notificationBubble.textContent = newCount;
+                } else {
+                    // Create new notification bubble
+                    notificationBubble = document.createElement('span');
+                    notificationBubble.className = 'absolute -top-2 -right-3 bg-red-500 text-white text-[10px] px-1 py-0.5 p-1 rounded-full font-bold leading-none';
+                    notificationBubble.textContent = newCount;
+                    cartLink.appendChild(notificationBubble);
+                }
+            } else {
+                // Remove bubble if cart is empty
+                if (notificationBubble) {
+                    notificationBubble.remove();
+                }
+            }
+        }
+
+        // ✅ Enhanced Toast logic with better styling
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.className = `fixed bottom-5 right-5 px-4 py-3 rounded-lg shadow-lg z-50 text-white text-sm font-medium transform transition-all duration-300 ${
+        type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+
+            // Add slide-in animation
+            toast.style.transform = 'translateX(100%)';
+            document.body.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+            }, 10);
+
+            // Remove toast after 3 seconds with slide-out animation
+            setTimeout(() => {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+
+
         function openChat() {
             document.getElementById('chat-box').style.display = 'block';
             document.getElementById('chat-toggle').style.display = 'none';

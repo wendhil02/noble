@@ -33,7 +33,7 @@ include '../../connection/connect.php';
     <?php endif; ?>
 
     <!-- Page Header -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+    <div class=" px-4 sm:px-6 lg:px-8 mt-10">
         <h2 class="text-2xl font-semibold text-gray-800 text-center mb-6">Client Info Table</h2>
 
         <!-- Table Container -->
@@ -41,33 +41,48 @@ include '../../connection/connect.php';
             <table class="min-w-full text-sm text-left text-gray-700">
                 <thead class="bg-gray-200 text-gray-600 uppercase text-xs tracking-wider">
                     <tr>
-                        <th class="px-6 py-4">Name</th>
-                        <th class="px-6 py-4">Address</th>
-                        <th class="px-6 py-4">Email</th>
-                        <th class="px-6 py-4">Contact</th>
+                      
+                        <th class="px-4 py-3">Reference No</th>
+                        <th class="px-4 py-3">Name</th>
+                        <th class="px-4 py-3">Address</th>
+                        <th class="px-4 py-3">Email</th>
+                        <th class="px-4 py-3">Contact</th>
+                        <th class="px-4 py-3">Country</th>
+                        <th class="px-4 py-3">Client Type</th>
+                        <th class="px-4 py-3">Sex</th>
+                        <th class="px-4 py-3">Status</th>
+                      
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <?php
-                    $query = "SELECT * FROM client_info";
+                    $query = "SELECT * FROM client_info ORDER BY created_at DESC";
                     $result = $conn->query($query);
 
                     if ($result && $result->num_rows > 0):
                         while ($row = $result->fetch_assoc()):
                     ?>
                             <tr class="hover:bg-gray-50">
-
-                                <td class="px-6 py-4"><?php echo htmlspecialchars($row['name']); ?></td>
-                                <td class="px-6 py-4"><?php echo htmlspecialchars($row['address']); ?></td>
-                                <td class="px-6 py-4"><?php echo htmlspecialchars($row['email']); ?></td>
-                                <td class="px-6 py-4"><?php echo htmlspecialchars($row['contact']); ?></td>
+                              
+                                <td class="px-4 py-3"><?php echo htmlspecialchars($row['reference_no']); ?></td>
+                                <td class="px-4 py-3"><?php echo htmlspecialchars($row['name']); ?></td>
+                                <td class="px-4 py-3"><?php echo htmlspecialchars($row['address']); ?></td>
+                                <td class="px-4 py-3"><?php echo htmlspecialchars($row['email']); ?></td>
+                                <td class="px-4 py-3"><?php echo htmlspecialchars($row['contact']); ?></td>
+                                <td class="px-4 py-3"><?php echo htmlspecialchars($row['country']); ?></td>
+                                <td class="px-4 py-3"><?php echo htmlspecialchars($row['client_type']); ?></td>
+                                <td class="px-4 py-3"><?php echo htmlspecialchars($row['sex']); ?></td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-block px-2 py-1 text-xs rounded 
+                                        <?= $row['status'] === 'Confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' ?>">
+                                        <?= htmlspecialchars($row['status']) ?>
+                                    </span>
+                                </td>
+                              
                             </tr>
-                        <?php
-                        endwhile;
-                    else:
-                        ?>
+                        <?php endwhile; else: ?>
                         <tr>
-                            <td colspan="7" class="text-center px-6 py-4 text-gray-500">No records found.</td>
+                            <td colspan="11" class="text-center px-6 py-4 text-gray-500">No client records found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -76,5 +91,4 @@ include '../../connection/connect.php';
     </div>
 
 </body>
-
 </html>

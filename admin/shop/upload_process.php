@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $type_id = $stmt_type->insert_id;
             $stmt_type->close();
 
-            // Insert product_variants
+            // Insert product_variants - FIXED PART
             if (isset($_POST["variant_color"][$i]) && is_array($_POST["variant_color"][$i])) {
                 foreach ($_POST["variant_color"][$i] as $j => $variant_color) {
                     $variant_size = $_POST["variant_size"][$i][$j] ?? '';
@@ -65,9 +65,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $namevariant = $_POST["variant_namevariant"][$i][$j] ?? '';
 
                     $variant_image_data = null;
-                    if (isset($_FILES["variant_image"]["error"][$i][$j]) &&
-                        $_FILES["variant_image"]["error"][$i][$j] === UPLOAD_ERR_OK) {
+                    
+                    // DEBUG: Add this to see the file structure
+                    error_log("Checking variant image [$i][$j]: " . print_r($_FILES["variant_image"], true));
+                    
+                    // Fixed variant image handling
+                    if (isset($_FILES["variant_image"]["tmp_name"][$i][$j]) && 
+                        isset($_FILES["variant_image"]["error"][$i][$j]) &&
+                        $_FILES["variant_image"]["error"][$i][$j] === UPLOAD_ERR_OK &&
+                        !empty($_FILES["variant_image"]["tmp_name"][$i][$j])) {
+                        
                         $variant_image_data = file_get_contents($_FILES["variant_image"]["tmp_name"][$i][$j]);
+                        error_log("Variant image loaded successfully for [$i][$j]");
+                    } else {
+                        error_log("Variant image not loaded for [$i][$j] - Error: " . 
+                                 ($_FILES["variant_image"]["error"][$i][$j] ?? 'undefined'));
                     }
 
                     $stmt_var = $conn->prepare("INSERT INTO product_variants (type_id, color, size, price, percent, discount, namevariant, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");

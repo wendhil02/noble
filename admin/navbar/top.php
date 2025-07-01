@@ -30,7 +30,10 @@
             <!-- Main Categories -->
             <div class="w-1/2 border-r p-4 space-y-2">
               <button @mouseenter="selected = 'materials'" class="block w-full text-left hover:text-orange-500">Edit & Update Materials</button>
+
+                <button @mouseenter="selected = 'order'" class="block w-full text-left hover:text-orange-500">Order & Products</button>
             </div>
+
 
             <!-- Subpanel -->
             <div class="w-1/2 p-4">
@@ -41,20 +44,19 @@
                 </div>
               </template>
 
-              <template x-if="selected === 'furniture'">
+              <template x-if="selected === 'order'">
                 <div>
-                  <p class="font-bold mb-2">Ceiling Options</p>
-                  <a href="products/ceiling-flat.php" class="block hover:text-orange-500">Flat Ceiling</a>
-                  <a href="products/ceiling-wood.php" class="block hover:text-orange-500">Wood Pattern</a>
+                  <a href="../orders/orders" class="block hover:text-orange-500">Order List</a>
+                  <a href="../qrcodeperproduct/qrcodeitem" class="block hover:text-orange-500">Product List</a>
                 </div>
               </template>
             </div>
           </div>
         </div>
 
-        <a href="about.php" class="<?= $current_page == 'about.php' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition">Client Management</a>
-        <a href="contact.php" class="<?= $current_page == 'contact.php' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition">Inquiry Management</a>
-        <a href="quote.php" class="<?= $current_page == 'quote.php' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition">Transaction Management</a>
+        <a href="../addclient/insertclient" class="<?= $current_page == '../addclient/insertclient' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition">Client Manage</a>
+        <a href="contact.php" class="<?= $current_page == 'contact.php' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition">Inquire Manage</a>
+        <a href="quote.php" class="<?= $current_page == 'quote.php' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition">Transaction Manage</a>
       </div>
 
       <!-- Mobile Hamburger -->

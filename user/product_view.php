@@ -93,6 +93,20 @@ foreach ($types as $type) {
 
   <?php include 'navbar/top.php'; ?>
 
+  <?php if (isset($_SESSION['toast'])): ?>
+    <div class="fixed top-5 right-5 z-50 bg-green-500 border border-green-400 text-white px-4 py-3 rounded shadow-lg animate-fade-in">
+        <?= htmlspecialchars($_SESSION['toast']['message']) ?>
+    </div>
+    <script>
+        setTimeout(() => {
+            const toast = document.querySelector('.fixed.z-50');
+            if (toast) toast.remove();
+        }, 3000);
+    </script>
+    <?php unset($_SESSION['toast']); ?>
+<?php endif; ?>
+
+
   <!-- Navigation breadcrumb -->
   <div class="max-w-8xl mx-auto px-4 py-4">
     <nav class="text-sm text-gray-600">
@@ -287,6 +301,7 @@ foreach ($types as $type) {
               <input type="hidden" name="product_id" value="<?= $product_id ?>">
               <input type="hidden" name="selected_type" id="selected_type">
               <input type="hidden" name="selected_variant" id="selected_variant">
+              <input type="hidden" name="return_url" value="product_view.php?id=<?= $product['id'] ?>">
 
               <!-- Price Display -->
               <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
