@@ -176,24 +176,24 @@ foreach ($cart as $item) {
           </svg>
           Shop
         </a>
-<a href="javascript:void(0)" onclick="navigateWithLoading('cart_view')"
-  class="<?= $current_page == 'cart/cart_view' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition inline-flex items-center gap-1 relative">
 
-  <!-- Cart Icon -->
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7a1 1 0 00.9 1.5h11.1M16 21a1 1 0 100-2 1 1 0 000 2zm-8 0a1 1 0 100-2 1 1 0 000 2z" />
-  </svg>
+        <a href="javascript:void(0)" onclick="navigateWithLoading('cart_view')"
+          class="<?= $current_page == 'cart/cart_view' ? 'text-orange-600 underline font-bold' : 'text-gray-700' ?> hover:text-orange-500 transition inline-flex items-center gap-1 relative">
 
-  <!-- Text -->
-  Cart
-
-  <!-- 🔴 Notification Bubble -->
-  <span id="cartCountBadge" class="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] px-1 py-0.5 p-1 rounded-full font-bold leading-none <?= ($total_cart_items > 0 ? '' : 'hidden') ?>">
-    <?= $total_cart_items ?>
-  </span>
-</a>
-
+          <!-- Cart Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7a1 1 0 00.9 1.5h11.1M16 21a1 1 0 100-2 1 1 0 000 2zm-8 0a1 1 0 100-2 1 1 0 000 2z" />
+          </svg>
+          <!-- Text -->
+          Cart
+          <!-- 🔴 Notification Bubble -->
+          <?php if ($total_cart_items > 0): ?>
+            <span class="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] px-1 py-0.5 p-1 rounded-full font-bold leading-none">
+              <?= $total_cart_items ?>
+            </span>
+          <?php endif; ?>
+        </a>
 
       </div>
 

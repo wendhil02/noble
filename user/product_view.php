@@ -95,16 +95,16 @@ foreach ($types as $type) {
 
   <?php if (isset($_SESSION['toast'])): ?>
     <div class="fixed top-5 right-5 z-50 bg-green-500 border border-green-400 text-white px-4 py-3 rounded shadow-lg animate-fade-in">
-        <?= htmlspecialchars($_SESSION['toast']['message']) ?>
+      <?= htmlspecialchars($_SESSION['toast']['message']) ?>
     </div>
     <script>
-        setTimeout(() => {
-            const toast = document.querySelector('.fixed.z-50');
-            if (toast) toast.remove();
-        }, 3000);
+      setTimeout(() => {
+        const toast = document.querySelector('.fixed.z-50');
+        if (toast) toast.remove();
+      }, 3000);
     </script>
     <?php unset($_SESSION['toast']); ?>
-<?php endif; ?>
+  <?php endif; ?>
 
 
   <!-- Navigation breadcrumb -->
@@ -297,35 +297,34 @@ foreach ($types as $type) {
 
           <!-- Purchase Section -->
           <div class="border-t pt-8">
-            <form id="addToCartForm" class="space-y-6">
-  <input type="hidden" name="product_id" value="<?= $product_id ?>">
-  <input type="hidden" name="selected_type" id="selected_type">
-  <input type="hidden" name="selected_variant" id="selected_variant">
-  <input type="hidden" name="return_url" value="product_view.php?id=<?= $product['id'] ?>">
+            <!-- ✅ Add to Cart Form -->
+            <form class="add-to-cart-form space-y-6">
+              <input type="hidden" name="product_id" value="<?= $product_id ?>">
+              <input type="hidden" name="selected_type" id="selected_type">
+              <input type="hidden" name="selected_variant" id="selected_variant">
+              <input type="hidden" name="return_url" value="product_view.php?id=<?= $product['id'] ?>">
 
-  <!-- Price Display -->
-  <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm text-gray-600 mb-1">Total Price</p>
-        <p id="totalPrice" class="text-3xl font-bold text-green-600">₱0.00</p>
-      </div>
-    </div>
-  </div>
+              <!-- Price Display -->
+              <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 mb-1">Total Price</p>
+                    <p id="totalPrice" class="text-3xl font-bold text-green-600">₱0.00</p>
+                  </div>
+                </div>
+              </div>
 
-  <!-- Add to Cart Button -->
-  <button
-    type="submit"
-    class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-3 group">
-    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6"></path>
-    </svg>
-    Proceed
-  </button>
-
-  <!-- Optional: feedback -->
-  <p id="cartMessage" class="text-green-600 font-semibold hidden"></p>
-</form>
+              <!-- Add to Cart Button -->
+              <button
+                type="submit"
+                class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-3 group">
+                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7a1 1 0 00.9 1.5h11.1M16 21a1 1 0 100-2 1 1 0 000 2zm-8 0a1 1 0 100-2 1 1 0 000 2z" />
+                </svg>
+                Proceed
+              </button>
+            </form>
 
           </div>
         </div>
@@ -333,39 +332,88 @@ foreach ($types as $type) {
     </div>
 
     <script>
+      document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', async function(e) {
+          e.preventDefault(); // Stop page reload
 
-document.getElementById('addToCartForm').addEventListener('submit', function(e) {
-  e.preventDefault();
+          const formData = new FormData(this);
 
-  const form = e.target;
-  const formData = new FormData(form);
+          try {
+            const response = await fetch('cart/add_to_cart.php', {
+              method: 'POST',
+              body: formData
+            });
 
-  fetch('cart/add_to_cart.php', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      // ✅ Show message
-      const msg = document.getElementById('cartMessage');
-      msg.textContent = data.message;
-      msg.classList.remove('hidden');
-      msg.classList.add('block');
+            const result = await response.json(); // Expect JSON response
 
-      // ✅ Update cart count badge
-      const badge = document.getElementById('cartCountBadge');
-      badge.textContent = data.cart_count;
-      badge.classList.remove('hidden');
-    } else {
-      console.error(data.error || 'Add to cart failed');
-    }
-  })
-  .catch(error => {
-    console.error('Error adding to cart:', error);
-  });
-});
+            if (response.ok && result.success) {
+              // ✅ Show success toast
+              showToast("Added to cart successfully!", "success");
 
+              // ✅ Update cart count dynamically
+              updateCartCount(result.cart_count);
+
+            } else {
+              showToast(result.message || "Failed to add to cart.", "error");
+            }
+
+          } catch (error) {
+            console.error('Error:', error);
+            showToast("Network error. Please try again.", "error");
+          }
+        });
+      });
+
+      // ✅ Function to update cart count in navigation
+      function updateCartCount(newCount) {
+        const cartLink = document.querySelector('a[onclick*="cart_view"]');
+        if (!cartLink) return;
+
+        // Find existing notification bubble
+        let notificationBubble = cartLink.querySelector('.bg-red-500');
+
+        if (newCount > 0) {
+          if (notificationBubble) {
+            // Update existing bubble
+            notificationBubble.textContent = newCount;
+          } else {
+            // Create new notification bubble
+            notificationBubble = document.createElement('span');
+            notificationBubble.className = 'absolute -top-2 -right-3 bg-red-500 text-white text-[10px] px-1 py-0.5 p-1 rounded-full font-bold leading-none';
+            notificationBubble.textContent = newCount;
+            cartLink.appendChild(notificationBubble);
+          }
+        } else {
+          // Remove bubble if cart is empty
+          if (notificationBubble) {
+            notificationBubble.remove();
+          }
+        }
+      }
+
+      // ✅ Enhanced Toast logic with better styling
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.className = `fixed bottom-5 right-5 px-4 py-3 rounded-lg shadow-lg z-50 text-white text-sm font-medium transform transition-all duration-300 ${
+        type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+
+        // Add slide-in animation
+        toast.style.transform = 'translateX(100%)';
+        document.body.appendChild(toast);
+
+        // Trigger animation
+        setTimeout(() => {
+          toast.style.transform = 'translateX(0)';
+        }, 10);
+
+        // Remove toast after 3 seconds with slide-out animation
+        setTimeout(() => {
+          toast.style.transform = 'translateX(100%)';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
 
       document.addEventListener("DOMContentLoaded", () => {
         const variantGroups = document.querySelectorAll(".variant-group");
